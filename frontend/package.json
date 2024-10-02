@@ -1,0 +1,31 @@
+{
+  "name": "quize-app",
+  "version": "1.0.0",
+  "description": "A beautiful place to cheak your knowledge",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "sam",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samiran634/Quize-App.git"
+  },
+  "keywords": [
+    "gt"
+  ],
+  "bugs": {
+    "url": "https://github.com/samiran634/Quize-App/issues"
+  },
+  "homepage": "https://github.com/samiran634/Quize-App#readme",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "mongoose": "^8.6.1",
+    "nodemon": "^3.1.4",
+    "pug": "^3.0.3"
+  }
+}
