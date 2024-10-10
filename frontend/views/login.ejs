@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Form</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">Quiz App</a>
+  </nav>
+
+  <style>
+    .navbar {
+      background-color: transparent;
+      padding: 1em;
+      text-align: left;
+    }
+
+    .navbar-brand {
+      color: rgb(81, 48, 232);
+      font-size: 3.5em;
+      text-decoration: none;
+      font-weight: bold;
+      margin-left: 1em;
+    }
+
+    .navbar-brand:hover {
+      color: #ddd;
+    }
+  </style>
+
+
+  <div class="box-container">
+    <div class="form-container">
+      <!-- The form element with action and method attributes -->
+      <form action="/login" method="post">
+        <input name="userEmail" class="input" type="text" placeholder="Email" required />
+        <input name="passward" class="input" type="password" placeholder="Password" required style="padding-right: 5em;" />
+        
+        <a href="#" class="muted-link">Forgot Password?</a>
+
+        <div class="margin-vertical"></div>
+
+        <button type="submit" class="login-btn submit-button">Login</button>
+
+        <div class="margin-vertical"></div>
+
+        <span class="muted-link">
+          Don't have an Account?
+          <a href="/signup" class="bold-link">Sign Up</a>
+        </span>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript file to handle additional login functionalities (if needed) -->
+  <script src="/javascript/login.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,502 @@
+@import url("https://uilight.netlify.app/main.css");
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+ 
+  background-image:linear-gradient(to right,black ,green);
+}
+
+#scene-container {
+  width: 100%;
+  height: 100%;
+}
+ 
+
+h1 {
+  color: #2600ff;
+  padding-top: 2rem;
+}
+.flex-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.flex-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+}
+
+.flex-container * {
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .flex-container {
+    width: 95%;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .flex-container {
+    width: 100%;
+    border-radius: 0;
+  }
+}
+
+.flex-container button,
+.flex-container input,
+.flex-container a {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.flex-container button:hover,
+.flex-container input:hover,
+.flex-container a:hover {
+  opacity: 0.8;
+}
+
+.flex-container button:active,
+.flex-container input:active,
+.flex-container a:active {
+  transform: scale(0.98);
+}
+
+ .button.circular-btn.success {
+  background-color: green;
+}
+
+ .button.circular-btn.error {
+  background-color: red;
+}
+.navbar-links{
+  display: flex;
+  justify-content: space-between;
+  padding-top: 3.5em;
+  gap: 2em;
+}
+#ranktable-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid #2600ff;
+  border-radius: 25px;
+  background-image: linear-gradient(to left, #1a1a1a, #ffd700);
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+#ranktable-link:hover {
+  background-image: linear-gradient(to right, #1a1a1a, #ffd700);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+#ranktable-link:active {
+  transform: scale(0.95);
+}
+
+#login-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid #2600ff;
+  border-radius: 25px;
+  background-image: linear-gradient(to left, #1a1a1a, #ffd700);
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+#login-link:hover {
+  background-image: linear-gradient(to right, #1a1a1a, #ffd700);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+#login-link:active {
+  transform: scale(0.95);
+}
+#dashboard-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5em 1em;
+  border: 2px solid #2600ff;
+  border-radius: 25px;
+  background-image: linear-gradient(to left, #1a1a1a, #ffd700);
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+#dashboard-link:hover {
+  background-image: linear-gradient(to right, #1a1a1a, #ffd700);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+#dashboard-link:active {
+  transform: scale(0.95);
+}
+.flex-container  {
+ 
+ 
+  margin: 2rem auto;
+  display: flex;
+ align-items: center;
+ justify-content: center;
+ 
+  margin-top: 4rem;
+ 
+ 
+  color: #fafafa;
+}
+
+ 
+ 
+
+.section-rule-box {
+  color: #fafafa;
+}
+
+.rules {
+  color: #0f0404;
+}
+
+.rule-title {
+  text-decoration: underline;
+}
+
+.rules-list {
+  margin: 2rem 0;
+}
+
+.rule-point {
+  padding: 1rem 0.5rem;
+}
+
+.link-btn {
+  color: var(--text-color-primary);
+  text-decoration: none;
+  width: 100%;
+}
+
+.play-btn {
+  border: none;
+  background-color: #334155;
+  color: #fafafa;
+  padding: 8px 1rem;
+  font-size: 1.5rem;
+  border-radius: 4px;
+}
+
+.play-btn:hover {
+  opacity: 0.85;
+}
+
+.hide {
+  display: none;
+}
+
+.quiz {
+  background-color: #94a3b8;
+  color: #150202;
+  padding: 2rem;
+  width: 45vw;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  box-shadow: 0 0 10px 5px rgba(0, 0, 255, 0.3);
+  transition: box-shadow 0.3s ease;
+}
+
+.quiz:hover {
+  box-shadow: 0 0 15px 8px rgba(255, 251, 0, 0.372);
+}
+
+.result {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  color: #cbd5e1;
+  background-color: #2660b1;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.result:hover {
+  transform: translate(-50%, -52%) scale(1.05);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.quiz-category {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.questions-container {
+  font-size: 1.5rem;
+  word-break: break-all;
+}
+
+.options-contianer .button {
+  background-color: #475569;
+  color: #fafafa;
+  border-radius: 2rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  padding: 10px 0;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-space-between {
+  justify-content: space-between;
+}
+
+.cta {
+  font-size: 1.25rem;
+  font-weight: bold;
+  border: none;
+  padding: 10px 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.quit {
+  background-color: #cbd5e1;
+  font-weight: 600;
+}
+
+.next {
+  background-color: #334155;
+  color: #fafafa;
+  font-weight: 600;
+}
+
+.circular-btn {
+  cursor: pointer;
+  border: solid  #334155;
+  border-radius:2em ;
+  background-color:rgb(151, 198, 239);
+}
+
+.qns-count,
+.cur-score {
+  font-size: 1.25rem;
+}
+/* Spinner image design */
+.spinner {
+  
+  
+  width: 50px;
+  height: 50px;
+}
+.overlay{
+  height: 100%;
+  width: 100%;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  background-color:rbga(0,0,0,0.5);
+  
+}
+.spinner-image {
+  width: 100%;
+  height: 100%;
+  animation: spin 1s linear infinite;
+}
+
+/* Spin animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.box-container {
+  width: 300px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin: 50px auto;
+  text-align: center;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.input {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.submit-button {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.muted-link, .bold-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.bold-link {
+  font-weight: bold;
+}
+
+.muted-link:hover, .bold-link:hover {
+  text-decoration: underline;
+}
+
+.margin-vertical {
+  margin-top: 1em;
+}
+.box-container {
+  width: 300px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin: 50px auto;
+  text-align: center;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+}
+#modal {
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 2px solid #4CAF50;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+  color: #fff;
+  padding: 30px;
+  max-width: 400px;
+  width: 90%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  transition: all 0.3s ease-in-out;
+}
+
+#modal h2 {
+  font-family: 'Arial', sans-serif;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #4CAF50;
+}
+
+#modal input[type="number"] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1em;
+}
+
+#modal input[type="number"]::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#modal button[data-name="submit-btn"] {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#modal button[data-name="submit-btn"]:hover {
+  background-color: #45a049;
+}
+
+#modal.hide {
+  opacity: 0;
+  visibility: hidden;
+}
+#modal {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#modal:hover {
+  transform: translate(-50%, -52%) scale(1.02);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+
+.input {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.submit-button {
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.muted-link, .bold-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.bold-link {
+  font-weight: bold;
+}
+
+.muted-link:hover, .bold-link:hover {
+  text-decoration: underline;
+}
+
+.margin-vertical {
+  margin-top: 1em;
+}
+

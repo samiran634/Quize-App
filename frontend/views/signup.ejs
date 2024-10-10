@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup Form</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <div class="box-container">
+    <!-- Updated form with action and method attributes -->
+    <form action="/create" method="POST">
+      <div class="form-container">
+        <!-- Name attributes are added to input fields -->
+        <input name="name" id="nameInput" class="input" type="text" placeholder="Full Name" required />
+        <input name="userEmail" id="emailInput" class="input" type="email" placeholder="Email" required />
+        <input name="passward" id="passwordInput" class="input" type="password" placeholder="Password" required />
+        <input name="conformpassward" id="confirmPasswordInput" class="input" type="password" placeholder="Confirm Password" required />
+      </div>
+
+      <div class="margin-vertical"></div>
+
+      <button type="submit" id="signupButton" class="login-btn submit-button">Signup</button>
+
+      <div class="margin-vertical"></div>
+
+      <span class="muted-link">
+        Already have an account?
+        <a href="/login" class="bold-link">Sign In</a>
+      </span>
+    </form>
+  </div>
+
+  <!-- JavaScript file for additional functionality if needed -->
+  <script src="/javascript/signup.js" type="module"></script>
+</body>
+</html>

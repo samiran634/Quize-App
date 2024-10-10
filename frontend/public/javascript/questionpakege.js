@@ -8,7 +8,7 @@ export default function quizedata(noOfQuestion, catagoryind) {
         // Parse the response as JSON
         const data = await response.json();  
        
-        console.log(data);
+        return data.results;
     
       } catch (err) {
         console.error(err);
@@ -19,9 +19,11 @@ export default function quizedata(noOfQuestion, catagoryind) {
   
   if (catagoryind !== undefined) {
       let URL = `${baseURL}&category=${catagoryind}`;  // Correct 'catagory' to 'category'
-      fetchData(URL);
+      let data=fetchData(URL);
+      return data;
   } else {
-      fetchData(baseURL);
+      let data=fetchData(baseURL);
+      return data;
   }
 
 }

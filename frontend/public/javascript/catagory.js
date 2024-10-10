@@ -16,6 +16,7 @@ let arrayOfCategories = [
       flex-wrap: wrap; 
       gap: 10px;
       justify-content: space-between;
+      color:black;
     `;
   
     for (let ele of arrayOfCategories) {
@@ -31,10 +32,10 @@ let arrayOfCategories = [
         height:3em;
         padding: .5 em;
         margin:.5em;
-        background-color: #f0f0f0;
+        background-color: black;
         border-radius: 8px;
         transition: transform 0.3s ease, background-color 0.3s ease;
-        color:black;
+        color:white;
       `;
       
       // Add hover effect for a "cool" style
@@ -44,7 +45,7 @@ let arrayOfCategories = [
       };
       input_container.onmouseout = () => {
         input_container.style.transform = "scale(1)";
-        input_container.style.backgroundColor = "#f0f0f0";
+        input_container.style.backgroundColor = "black";
       };
   
       // Create the input element
