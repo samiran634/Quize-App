@@ -4,7 +4,7 @@ body, html {
   padding: 0;
   height: 100%;
  
-  background-image:linear-gradient(to right,black ,green);
+  background-image:linear-gradient(to right,black ,rgb(47, 125, 47));
 }
 
 #scene-container {
@@ -18,12 +18,12 @@ h1 {
   padding-top: 2rem;
 }
 .flex-container {
-  width: 90%;
-  max-width: 1200px;
+  width: 100%;
+  max-width: 70em;
   margin: 0 auto;
   padding: 2rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  background-image: linear-gradient(to right, #1a1a1a,rgb(35, 144, 75));
+  border-radius: 2em;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
 }
@@ -156,7 +156,6 @@ h1 {
 .flex-container  {
  
  
-  margin: 2rem auto;
   display: flex;
  align-items: center;
  justify-content: center;
@@ -174,20 +173,87 @@ h1 {
   color: #fafafa;
 }
 
-.rules {
-  color: #0f0404;
-}
+ 
+ 
 
 .rule-title {
-  text-decoration: underline;
+ 
+  font-family: 'Arial', sans-serif;
+  font-size: 2.2em;
+  color: #000000;
+  text-shadow: 2px 2px 4px rgba(253, 251, 251, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #000000;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.rule-title:hover {
+  transform: scale(1.05) rotate(1deg);
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+  color: #444243;
+  transition: all 0.3s ease-in-out;
 }
 
 .rules-list {
-  margin: 2rem 0;
+  list-style-type: none;
+  padding-left: 1em;
+  margin: 1.5em 0;
+  counter-reset: rule-counter;
+}
+
+.rules-list li {
+  margin-bottom: 1em;
+  padding-left: 2em;
+  position: relative;
+}
+
+.rules-list li::before {
+  content: counter(rule-counter);
+  counter-increment: rule-counter;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.5em;
+  height: 1.5em;
+  background-color: #000000;
+  color:white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .rules-list li {
+    padding-left: 1.5em;
+  }
+}
+
+@media (max-width: 480px) {
+  .rules-list {
+    font-size: 0.95em;
+  }
+  
+  .rules-list li::before {
+    font-size: 0.8em;
+  }
 }
 
 .rule-point {
-  padding: 1rem 0.5rem;
+  padding: 1rem 1rem 1rem 0.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  font-size: 1.2em;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.rule-point:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .link-btn {
@@ -202,7 +268,14 @@ h1 {
   color: #fafafa;
   padding: 8px 1rem;
   font-size: 1.5rem;
-  border-radius: 4px;
+  border-radius: 4em;
+  font-weight: bold;
+  margin-top: 10em;
+}
+@media (max-width: 720px) {
+  .play-btn {
+    margin-top: 5em;
+  }
 }
 
 .play-btn:hover {
@@ -311,20 +384,28 @@ h1 {
 }
 /* Spinner image design */
 .spinner {
-  
-  
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 50px;
   height: 50px;
+  z-index: 10000;
 }
-.overlay{
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
   height: 100%;
   width: 100%;
   z-index: 9999;
   display: flex;
   justify-content: center;
-  background-color:rbga(0,0,0,0.5);
-  
+  align-items: center;
+  background-color: rgba(0, 0, 0, 1);
 }
+
 .spinner-image {
   width: 100%;
   height: 100%;
@@ -338,11 +419,11 @@ h1 {
 }
 
 .box-container {
-  width: 300px;
-  padding: 20px;
+  width: 18em;
+  padding: 1.5em;
   border: 1px solid #ccc;
   border-radius: 10px;
-  margin: 50px auto;
+  margin: 2em auto;
   text-align: center;
 }
 
@@ -359,7 +440,7 @@ h1 {
 }
 
 .submit-button {
-  padding: 10px;
+  padding: 1em;
   background-color: #007bff;
   color: white;
   border: none;
@@ -383,19 +464,7 @@ h1 {
 .margin-vertical {
   margin-top: 1em;
 }
-.box-container {
-  width: 300px;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  margin: 50px auto;
-  text-align: center;
-}
 
-.form-container {
-  display: flex;
-  flex-direction: column;
-}
 #modal {
   background-color: rgba(0, 0, 0, 0.8);
   border: 2px solid #4CAF50;
@@ -473,29 +542,6 @@ h1 {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-
-.submit-button {
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.muted-link, .bold-link {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.bold-link {
-  font-weight: bold;
-}
-
-.muted-link:hover, .bold-link:hover {
-  text-decoration: underline;
-}
-
 .margin-vertical {
   margin-top: 1em;
 }

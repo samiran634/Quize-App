@@ -71,6 +71,9 @@ async function showProfileData() {
       } else if (item === 'Settings') {
         a.href = '/settings';
       }
+      else if(item=='Profile'){
+        a.href='/profileboard';
+      }
       a.textContent = item;
       li.appendChild(a);
       menu.appendChild(li);
@@ -99,7 +102,7 @@ async function showProfileData() {
       { title: 'Rank', value: data.rank },
       { title: 'Name', value: data.name }, 
       { title: 'User Email', value: data.userEmail },
-      { title: 'Score', value: data.score },
+      { title: 'Highest Score', value: data.score },
     ];
 
     cardData.forEach(dataItem => {

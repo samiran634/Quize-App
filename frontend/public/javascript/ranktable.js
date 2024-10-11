@@ -64,18 +64,22 @@ function createRankingTable() {
   const headerRow = document.createElement('tr');
   thead.appendChild(headerRow);
 
+ 
+  // Function to sort data based on score
+  function sortDataByScore(data) {
+    return data.sort((a, b) => b.score - a.score);
+  }
+
+  // Sort the userRankings array
+  userRankings = sortDataByScore(userRankings);
+
+  // Keep headers in original order
   const headers = ['Rank', 'User Name', 'Score'];
-  // Sort headers based on score
-  headers.sort((a, b) => {
-    if (a === 'Score') return -1;
-    if (b === 'Score') return 1;
-    return 0;
-  });
   console.log(headers);
   headers.forEach(headerText => {
     const th = document.createElement('th');
     th.textContent = headerText;
-    th.style.padding = '15px';
+    th.style.padding = '0.5em';
     th.style.textAlign = 'left';
     th.style.fontSize = '1.1rem';
     headerRow.appendChild(th);
@@ -92,18 +96,18 @@ function createRankingTable() {
 
     const rankCell = document.createElement('td');
     rankCell.textContent = index + 1;  // Rank starts from 1
-    rankCell.style.padding = '15px';
+    rankCell.style.padding = '0.5em';
     rankCell.style.fontWeight = 'bold';
     row.appendChild(rankCell);
 
     const nameCell = document.createElement('td');
     nameCell.textContent = user.name;
-    nameCell.style.padding = '15px';
+    nameCell.style.padding = '0.5em';
     row.appendChild(nameCell);
 
     const scoreCell = document.createElement('td');
     scoreCell.textContent = user.score;
-    scoreCell.style.padding = '15px';
+    scoreCell.style.padding = '1em';
     row.appendChild(scoreCell);
 
     // Hover effect
@@ -115,7 +119,50 @@ function createRankingTable() {
     });
 
     tbody.appendChild(row);
+
+
+    
+    
   });
+  // Create a container for the button
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.display = 'flex';
+  buttonContainer.style.justifyContent = 'center';
+  buttonContainer.style.marginTop = '2em';
+
+  // Create the circular button
+  const homeButton = document.createElement('button');
+  homeButton.textContent = 'Go to Home';
+  homeButton.style.padding = '1em 1.5em';
+  homeButton.style.borderRadius = '50px';
+  homeButton.style.border = 'none';
+  homeButton.style.backgroundColor = '#3498db';
+  homeButton.style.color = 'white';
+  homeButton.style.fontSize = '1rem';
+  homeButton.style.fontWeight = 'bold';
+  homeButton.style.cursor = 'pointer';
+  homeButton.style.transition = 'all 0.3s ease';
+
+  // Add hover effect
+  homeButton.addEventListener('mouseover', () => {
+    homeButton.style.backgroundColor = '#2980b9';
+    homeButton.style.transform = 'scale(1.05)';
+  });
+  homeButton.addEventListener('mouseout', () => {
+    homeButton.style.backgroundColor = '#3498db';
+    homeButton.style.transform = 'scale(1)';
+  });
+
+  // Add click event to redirect to home
+  homeButton.addEventListener('click', () => {
+    window.location.href = '/';
+  });
+
+  // Append the button to the container
+  buttonContainer.appendChild(homeButton);
+
+  // Append the button container to the main container
+  container.appendChild(buttonContainer);
 
   // Append the container to the body
   document.body.appendChild(container);

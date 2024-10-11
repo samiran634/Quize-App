@@ -1,5 +1,5 @@
 window.addEventListener('load', function () {
-  document.querySelector('.spinner').style.display = 'none';
+  document.querySelector('.overlay').style.display = 'none';
 });
 import category_container from "./catagory.js";
 import quizedata from "./questionpakege.js";

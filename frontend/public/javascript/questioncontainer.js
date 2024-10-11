@@ -125,12 +125,7 @@ export default function QuestionContainer(container, containerzes, resultcontain
                 nextBtn.innerText = "Submit";
             }
         } else if (nextBtn.innerText === "Submit") {
-            container.classList.add("hide");
-            resultcontainer.classList.remove("hide");
-            resultcontainer.innerText = `YOUR SCORE: ${score}`;
-            console.log("Quiz finished!");  // Handle submission logic
-            submitScore();
-            updateUserRank();
+            finishQuiz();
         }
         updateButtonStates();
     });
@@ -138,10 +133,7 @@ export default function QuestionContainer(container, containerzes, resultcontain
     // Event listener for the Quit button
     quitBtn.addEventListener("click", () => {
         score = 0;
-        container.classList.add("hide");
-        resultcontainer.classList.remove("hide");
-        resultcontainer.innerText = `YOUR SCORE: ${score}`;
-        console.log("Quiz quit. Final score:", score);
+        finishQuiz();
     });
 
     // Event listener for options selection
@@ -181,9 +173,10 @@ export default function QuestionContainer(container, containerzes, resultcontain
     const timerElement = document.createElement('div');
     timerElement.classList.add('timer');
     timerElement.style.cssText = `
-        font-size: 24px;
+        font-size: 3.5em;
         font-weight: bold;
-        margin-top: 20px;
+        margin-top: 1.5em;
+        margin-bottom: 1.5em;
         text-align: center;
         display: none;
     `;
@@ -191,8 +184,9 @@ export default function QuestionContainer(container, containerzes, resultcontain
     const loadingMessage = document.createElement('div');
     loadingMessage.classList.add('loading-message');
     loadingMessage.style.cssText = `
-        font-size: 18px;
-        margin-top: 10px;
+        font-size: 1.5em;
+        margin-top: 1.5em;
+        margin-bottom: 1.5em;
         text-align: center;
         animation: blink 1s infinite;
         display: none;
@@ -233,40 +227,47 @@ export default function QuestionContainer(container, containerzes, resultcontain
         }, 1000);
     }
 
-    nextBtn.addEventListener("click", () => {
-        if (nextBtn.innerText === "Submit") {
-            startTimer();
-        }
-    });
-
-    quitBtn.addEventListener("click", () => {
+    // Function to handle quiz finish (both submit and quit)
+    function finishQuiz() {
+        container.classList.add("hide");
+        resultcontainer.classList.remove("hide");
+        resultcontainer.innerText = `YOUR SCORE: ${score}`;
+        console.log("Quiz finished. Final score:", score);
         startTimer();
-    });
+        submitScore(score); // Pass the score as an argument
+        updateUserRank(score); // Pass the score to updateUserRank
+    }
 
     createQuestionAndOptions();  // Initial call to display first question
+
+    return {
+        submitScore,
+        updateUserRank,
+        getCurrentUserEmail
+    };
 }
 
 // Function to handle score submission
-function submitScore() {
-    fetch('/updatescore', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ score: score })  // Submit the score
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log('Score submitted successfully');
-            window.location.href = '/dashboard';  // Redirect to the dashboard page
-        } else {
+async function submitScore(score) {
+    try {
+        const response = await fetch('/updatescore', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ score: score })
+        });
+
+        if (!response.ok) {
             throw new Error('Score submission failed');
         }
-    })
-    .catch(error => {
+
+        console.log('Score submitted successfully');
+    } catch (error) {
         console.error('Error submitting score:', error);
-    });
+    }
 }
+
 // Function to update rank in the database
 async function updateRank(rank) {
     try {
@@ -290,7 +291,7 @@ async function updateRank(rank) {
 }
 
 // Function to fetch and update user's rank
-async function updateUserRank() {
+async function updateUserRank(newScore) {
     try {
         const response = await fetch('/read', {
             method: 'GET',
@@ -308,13 +309,28 @@ async function updateUserRank() {
         // Sort users by score in descending order
         users.sort((a, b) => b.score - a.score);
 
-        // Find the current user's position (rank)
+        // Find the current user's email
         const currentUserEmail = await getCurrentUserEmail();
+
+        // Update the current user's score in the local array
+        const currentUserIndex = users.findIndex(user => user.userEmail === currentUserEmail);
+        if (currentUserIndex !== -1) {
+            users[currentUserIndex].score = newScore;
+        } else {
+            console.error('Current user not found in the list');
+            return;
+        }
+
+        // Re-sort the array with the updated score
+        users.sort((a, b) => b.score - a.score);
+
+        // Find the current user's new position (rank)
         const userRank = users.findIndex(user => user.userEmail === currentUserEmail) + 1;
 
         // Update the rank in the database
         await updateRank(userRank);
 
+        console.log('User rank updated to:', userRank);
         return userRank;
     } catch (error) {
         console.error('Error updating user rank:', error);
