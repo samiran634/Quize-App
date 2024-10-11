@@ -1,5 +1,5 @@
 const mongoose=require('mongoose');
-mongoose.connect("mongodb://localhost:27017/userdetails");
+mongoose.connect(process.env.MONGO_URL || "mongodb://localhost:27017/userdetails");
 const userschema=mongoose.Schema({
     name:String,
     userEmail:String,

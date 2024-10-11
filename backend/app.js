@@ -10,7 +10,7 @@ const playermodle = require('./playermodle.js');
 
 // Initialize express app
 const app = express();
-const PORT = 80;
+const PORT = process.env.PORT || 80;
 
 // Middleware setup
 app.use(express.json());
