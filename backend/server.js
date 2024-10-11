@@ -22,7 +22,7 @@ app.use(cookieparser());
 
 // View engine setup
 app.set('views', path.join(__dirname, '../frontend/views'));
-app.set('view engine', 'ejs');
+app.set('view engine', 'html');
 
 // Authentication middleware
 function authenticateToken(req, res, next) {
