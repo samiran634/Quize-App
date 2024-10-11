@@ -60,7 +60,7 @@ const isLoggedIn = (req, res, next) => {
 
 // Routes
 app.get("/", (req, res) => {
-  res.render("sudoindex");
+  res.render("index");
 });
 
 app.get("/login", (req, res) => {
@@ -99,7 +99,7 @@ app.post('/create', async (req, res) => {
       if (token) {
         return res.redirect('/home');
       }
-      res.render("sudoindex");
+      res.render("index");
     });
 
 
