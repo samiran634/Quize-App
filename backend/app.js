@@ -88,7 +88,7 @@ app.post('/create', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(passward, salt);
     
-    const usersCollection = getCollection();
+    const usersCollection = getCollection('users'); // Specify the collection name
     const existingUsers = await usersCollection.countDocuments();
 
     const newUser = {
@@ -115,14 +115,15 @@ app.post('/create', async (req, res) => {
 app.post('/login', async (req, res) => {
   try {
     const { userEmail, passward } = req.body;
-    const user = await playermodle.findOne({ userEmail });
+    const usersCollection = getCollection('users');
+    const user = await usersCollection.findOne({ userEmail });
 
     if (!user) {
       return res.status(400).send('User not found');
     }
 
     // Compare passwords
-    const isMatch = await bcrypt.compare(passward, user.passward);
+    const isMatch = await bcrypt.compare(passward, user.password);
     if (!isMatch) {
       return res.status(400).send('Invalid credentials');
     }
@@ -158,15 +159,13 @@ app.get('/dashboard', isLoggedIn, (req, res) => {
 // Profile route (fetching user data)
 app.get('/profile', isLoggedIn, async (req, res) => {
   try {
-    const user = await playermodle.findOne({ userEmail: req.user.userEmail });
+    const usersCollection = getCollection('users');
+    const user = await usersCollection.findOne({ userEmail: req.user.userEmail });
     if (!user) return res.status(404).send('User not found');
     res.send(user);
   } catch (error) {
     res.status(500).send('Server error');
   }
-});
-app.get('/profileboard',isLoggedIn,(req,res)=>{
-  res.render('profile');
 });
 
 // Update score route
@@ -178,20 +177,32 @@ app.post('/updatescore', authenticateToken, async (req, res) => {
     const userEmail = req.user.userEmail;
     console.log('User email:', userEmail);
 
-    const updatedUser = await playermodle.findOneAndUpdate(
+    const usersCollection = getCollection('users');
+    const updatedUser = await usersCollection.findOneAndUpdate(
       { userEmail: userEmail },
       { $set: { score: score } },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
-    if (!updatedUser) {
+    if (!updatedUser.value) {
       return res.status(404).send('User not found');
     }
-    res.send(updatedUser);
-    // res.redirect('/dashboard');
+    res.send(updatedUser.value);
   } catch (error) {
     console.error('Error updating score:', error);
     res.status(500).send('Server error');
+  }
+});
+// Database status check route
+app.get('/database-status', async (req, res) => {
+  try {
+    const usersCollection = getCollection('users');
+    // Perform a simple operation to check database connectivity
+    await usersCollection.findOne({}, { projection: { _id: 1 } });
+    res.status(200).json({ status: 'connected' });
+  } catch (error) {
+    console.error('Database connection error:', error);
+    res.status(500).json({ status: 'disconnected', error: error.message });
   }
 });
 
@@ -201,17 +212,18 @@ app.post('/updaterank', authenticateToken, async (req, res) => {
     const { rank } = req.body;
     const userEmail = req.user.userEmail;
 
-    const updatedUser = await playermodle.findOneAndUpdate(
+    const usersCollection = getCollection('users');
+    const updatedUser = await usersCollection.findOneAndUpdate(
       { userEmail: userEmail },
       { $set: { rank: rank } },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
-    if (!updatedUser) {
+    if (!updatedUser.value) {
       return res.status(404).send('User not found');
     }
 
-    res.status(200).json({ message: 'Rank updated successfully', user: updatedUser });
+    res.status(200).json({ message: 'Rank updated successfully', user: updatedUser.value });
   } catch (error) {
     console.error('Error updating rank:', error);
     res.status(500).send('Server error');
@@ -221,7 +233,8 @@ app.post('/updaterank', authenticateToken, async (req, res) => {
 // API route to read user data
 app.get('/read', async (req, res) => {
   try {
-    const users = await playermodle.find();
+    const usersCollection = getCollection('users');
+    const users = await usersCollection.find().toArray();
     res.json(users);
   } catch (error) {
     res.status(500).send('Server error');

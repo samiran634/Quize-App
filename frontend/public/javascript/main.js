@@ -1,5 +1,18 @@
 window.addEventListener('load', function () {
-  document.querySelector('.overlay').style.display = 'none';
+  // Check if the database is fully loaded
+  async function checkDatabaseLoaded() {
+    // This is a placeholder. You should implement a real check here.
+    return await fetch('/database-status')
+  }
+
+  checkDatabaseLoaded().then((isLoaded) => {
+    if (isLoaded) {
+      document.querySelector('.overlay').style.display = 'none';
+    } else {
+      console.error('Database failed to load');
+      // You might want to show an error message to the user here
+    }
+  });
 });
 import category_container from "./catagory.js";
 import quizedata from "./questionpakege.js";

@@ -1,7 +1,8 @@
+require('dotenv').config();
 const { MongoClient } = require('mongodb');
 
-const uri = process.env.MONGODB_URI; // Make sure this is set in your .env file
-const client = new MongoClient(uri);
+const uri = process.env.MONGODB_URI; 
+const client = new MongoClient(uri, { connectTimeoutMS: 30000, serverSelectionTimeoutMS: 30000 });
 
 let usersCollection;
 
@@ -11,9 +12,8 @@ async function connectToDatabase() {
     const database = client.db("playermodel");  
     usersCollection = database.collection("users");
 
-    // Create a schema validator for the users collection
-    await database.command({
-      collMod: "users",
+    // Ensure the 'users' collection exists with schema validation
+    await database.createCollection('users', {
       validator: {
         $jsonSchema: {
           bsonType: "object",
@@ -30,12 +30,19 @@ async function connectToDatabase() {
       }
     });
 
-    console.log("Connected to the database and user schema created successfully");
+    console.log("Connected to database and schema set up successfully");
   } catch (error) {
-    console.error("Error connecting to the database:", error);
+    console.error("Error connecting to the database:", error.message);
     throw error;
   }
 }
+
+// Close connection on app termination
+process.on('SIGINT', async () => {
+  await client.close();
+  console.log('MongoDB connection closed');
+  process.exit(0);
+});
 
 module.exports = {
   connectToDatabase,
