@@ -1,5 +1,5 @@
-require('dotenv').config();
-const { MongoClient } = require('mongodb');
+require('../node_modules/dotenv').config();
+const { MongoClient } = require('../node_modules/mongodb');
 
 const uri = process.env.MONGODB_URI; 
 const client = new MongoClient(uri, { connectTimeoutMS: 30000, serverSelectionTimeoutMS: 30000 });

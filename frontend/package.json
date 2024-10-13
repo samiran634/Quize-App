@@ -19,11 +19,5 @@
   "bugs": {
     "url": "https://github.com/samiran634/Quize-App/issues"
   },
-  "homepage": "https://github.com/samiran634/Quize-App#readme",
-  "dependencies": {
-    "ejs": "^3.1.10",
-    "mongoose": "^8.6.1",
-    "nodemon": "^3.1.4",
-    "pug": "^3.0.3"
-  }
+  "homepage": "https://github.com/samiran634/Quize-App#readme"
 }

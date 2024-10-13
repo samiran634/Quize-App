@@ -1,9 +1,9 @@
-const express = require("express");
-const cookieparser = require('cookie-parser');
-const path = require('path');
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-require('dotenv').config();
+const express = require("../node_modules/express");
+const cookieparser = require('../node_modules/cookie-parser');
+const path = require('../node_modules/path');
+const bcrypt = require("../node_modules/bcrypt");
+const jwt = require("../node_modules/jsonwebtoken");
+require('../node_modules/dotenv').config();
 
 // Import custom modules
 const { connectToDatabase, getCollection, closeConnection } = require('./playermodle.js');
