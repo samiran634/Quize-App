@@ -23,18 +23,18 @@ Step 3: Navigate to Backend
 Change directory to the backend folder:
 
 bash
-cd ./backend
+cd .\backend
 
 Step 4: Start the Node Server
 
 Start the Node server using nodemon:
 
 bash
-nodemon ./app.js
+nodemon .\app.js
 
 You're All Set!
 
-Open your browser and navigate to http://localhost:3000 (or the specified port) to access the quiz game.
+Open your browser and navigate to http://localhost:80 (or the specified port) to access the quiz game.
 
 What to Expect:
 
