@@ -180,9 +180,21 @@ app.post('/updatescore', authenticateToken, async (req, res) => {
     console.log('User email:', userEmail);
 
     const usersCollection = getCollection('users');
+    
+    // First, find the current user to get their existing score
+    const currentUser = await usersCollection.findOne({ userEmail: userEmail });
+    
+    if (!currentUser) {
+      return res.status(404).send('User not found');
+    }
+    
+    // Calculate the new score as the maximum of the existing score and the new score
+    const newScore = Math.max(currentUser.score || 0, score);
+    
+    // Update the user's score with the new maximum score
     const updatedUser = await usersCollection.findOneAndUpdate(
       { userEmail: userEmail },
-      { $set: { score: score } },
+      { $set: { score: newScore } },
       { returnDocument: 'after' }
     );
 
