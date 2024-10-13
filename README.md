@@ -1,4 +1,6 @@
 Get Ready to Quiz!
+Play the quiz by just clicking here also -->https://quize-app-qan3.onrender.com/
+OTHERWISE-->
 
 Run the App Locally and Showcase Your Knowledge!
 
