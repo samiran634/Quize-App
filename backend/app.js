@@ -143,7 +143,9 @@ app.get('/logout', (req, res) => {
   res.cookie("token", "", { expires: new Date(0) }); // Clear the token
   res.redirect("/");
 });
-
+app.get('/profileboard',isLoggedIn,(req,res)=>{
+  res.render('profile');
+})
 // Protected routes (accessible only when logged in)
 
 // Home route
@@ -203,6 +205,109 @@ app.get('/database-status', async (req, res) => {
   } catch (error) {
     console.error('Database connection error:', error);
     res.status(500).json({ status: 'disconnected', error: error.message });
+  }
+});
+app.get('/settings',isLoggedIn,(req,res)=>{
+  res.render('settings');
+})
+// Update password route
+app.post('/updatepassword', authenticateToken, async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+    const userEmail = req.user.userEmail;
+    console.log('Authenticated user email:', userEmail);
+
+    if (!newPassword) {
+      return res.status(400).json({ message: 'New password is required' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Fetch the collection and update the password
+    const usersCollection = getCollection('users');
+    const updatedUser = await usersCollection.findOneAndUpdate(
+      { userEmail: { $regex: new RegExp(`^${userEmail}$`, 'i') } },  // Case-insensitive email check
+      { $set: { password: hashedPassword } },
+      { returnDocument: 'after' }
+    );
+
+    if (!updatedUser.value) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error updating password:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Forget password route (renders reset password page)
+app.get('/resetpassword', (req, res) => {
+  res.render('resetpassword');  // Fixed typo in 'resetpassword'
+});
+
+// Forget password POST route
+app.post('/forgetpassword', async (req, res) => {
+  try {
+    const { userEmail, newPassword } = req.body;
+    console.log('Received reset request for email:', userEmail);
+
+    if (!userEmail || !newPassword) {
+      return res.status(400).json({ message: 'Email and new password are required' });
+    }
+
+    const usersCollection = getCollection('users');
+
+    // Find the user with case-insensitive email matching
+    const user = await usersCollection.findOne({ userEmail: { $regex: new RegExp(`^${userEmail}$`, 'i') } });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password
+    const updatedUser = await usersCollection.findOneAndUpdate(
+      { userEmail: { $regex: new RegExp(`^${userEmail}$`, 'i') } },
+      { $set: { password: hashedPassword } },
+      { returnDocument: 'after' }
+    );
+
+    if (!updatedUser.value) {
+      return res.status(404).json({ message: 'Failed to update password' });
+    }
+
+    res.status(200).json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Check if user exists route
+app.post('/checkuser', async (req, res) => {
+  try {
+    const { userEmail } = req.body;
+
+    if (!userEmail) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    const usersCollection = getCollection('users');
+    const user = await usersCollection.findOne({ userEmail: userEmail });
+
+    if (user) {
+      res.status(200).json({ exists: true, message: 'User found' });
+    } else {
+      res.status(200).json({ exists: false, message: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error checking user:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
