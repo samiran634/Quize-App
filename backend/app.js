@@ -10,7 +10,7 @@ const { connectToDatabase, getCollection, closeConnection } = require('./playerm
 
 // Initialize express app
 const app = express();
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 4000;
 
 // Middleware setup
 app.use(express.json());
