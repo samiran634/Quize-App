@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 require('dotenv').config();
 
 // Import custom modules
-const playermodle = require('./playermodle.js');
+const { connectToDatabase, getCollection, closeConnection } = require('./playermodle.js');
 
 // Initialize express app
 const app = express();
@@ -85,26 +85,25 @@ app.post('/create', async (req, res) => {
   const { name, userEmail, passward } = req.body;
 
   try {
-    // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(passward, salt);
-    let data=playermodle.findOne();
-    // Create new user in the database
-    await playermodle.create({
+    
+    const usersCollection = getCollection();
+    const existingUsers = await usersCollection.countDocuments();
+
+    const newUser = {
       name,
       userEmail,
-      passward: hash,
+      password: hash,
       score: 0,
-      rank: data.length
-    });
+      logintime: new Date().toISOString(),
+      rank: existingUsers + 1
+    };
 
-    // Generate the JWT token
+    const result = await usersCollection.insertOne(newUser);
+
     const token = jwt.sign({ userEmail }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    // Set the token in the cookies
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
-
-    // Redirect to the home page
     res.redirect("/home");
   } catch (error) {
     console.error('Error creating user:', error);
@@ -235,7 +234,19 @@ app.use((req, res, next) => {
   res.status(404).send('Route not found');
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`App is running on http://localhost:${PORT}`);
+// Connect to the database before starting the server
+connectToDatabase().then(() => {
+  // Start the server
+  app.listen(PORT, () => {
+    console.log(`App is running on http://localhost:${PORT}`);
+  });
+}).catch(error => {
+  console.error("Failed to connect to the database:", error);
+  process.exit(1);
+});
+
+// When your application is shutting down:
+process.on('SIGINT', async () => {
+  await closeConnection();
+  process.exit(0);
 });
