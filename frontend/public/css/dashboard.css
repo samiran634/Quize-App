@@ -5,10 +5,12 @@
     background-image: linear-gradient(250deg,rgb(39, 1, 19),rgb(87, 152, 236));
     color: white;
   }
-  
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+  @media (max-width: 768px) { 
+    #parent{
+      margin-top: 4em;
+      font-family: Arial, sans-serif;
+    }
+
   }
   
   .container {

@@ -21,7 +21,7 @@ import QuestionContainer from "./questioncontainer.js";
 // Variables for DOM elements
 let mainContainer, bgContainer, box, playBtn, quizContainer, resultContainer,flexcontainer;
 let index, num, catagotystring;
-
+let menuBtnopen ;
 window.addEventListener('DOMContentLoaded', () => {
   initDOMElements();
 
@@ -67,6 +67,11 @@ function initDOMElements() {
   if(!flexcontainer){
     console.error('flexcontainer not found!');
   }
+  menuBtnopen=document.getElementById("menu-open-btn");
+  if(!menuBtnopen){
+    console.error('menuBtn not found!');
+  }
+ 
 }
 initDOMElements();
 
@@ -129,6 +134,35 @@ mainContainer.addEventListener("click",(event)=>{
     chooseCategory()
   }
 })
+menuBtnopen.addEventListener("click", () => {
+ 
+  menuBtnopen.classList.toggle("hide");
+  const navbar = document.querySelector('.navbar');
+  const navbarLinks = document.querySelector('.navbar-links');
+
+  if (navbar.classList.contains('hide')) {
+    navbar.classList.remove('hide');
+    navbar.style.display = 'flex';
+    navbar.style.flexDirection = 'column';
+    navbar.style.position = 'fixed';
+    navbar.style.top = '0';
+    navbar.style.left = '0';
+    navbar.style.width = '100%';
+    navbar.style.height = '100vh';
+    navbar.style.backgroundColor = '#334155';
+    navbar.style.zIndex = '1000';
+
+    navbarLinks.style.display = 'flex';
+    navbarLinks.style.flexDirection = 'column';
+    navbarLinks.style.alignItems = 'center';
+    navbarLinks.style.justifyContent = 'center';
+    navbarLinks.style.height = '100%';
+  } else {
+    navbar.classList.add('hide');
+    navbar.style.display = 'none';
+  }
+});
+ 
 function chooseCategory() {
   mainContainer.classList.add("hide");
 

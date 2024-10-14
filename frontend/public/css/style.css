@@ -285,6 +285,9 @@ h1 {
 .hide {
   display: none;
 }
+.container{
+  width: 90%;
+}
 .container-category{
   font-size: 1.5rem;
   font-weight: 700;
@@ -295,6 +298,7 @@ h1 {
 
 .quiz {
   background-color: #94a3b8;
+  margin-top: 7em;
   color: #150202;
   padding: 2rem;
   width: 45vw;
@@ -306,17 +310,56 @@ h1 {
   box-shadow: 0 0 10px 5px rgba(0, 0, 255, 0.3);
   transition: box-shadow 0.3s ease;
 }
+#menu-open-btn {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 1000;
+  display: none;
+}
+@media (max-width: 780px) {
+  .navbar-mini-container {
+    display: flex;
+  }
+  #menu-open-btn{
+    display: block;
+  }
+  .result{
+    margin-top: 4em;
+  }
 
+  .navbar {
+    display: none;
+  }
+
+  .navbar.hide {
+    display: flex;
+  }
+}
+.navbar-title-mini{
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #290ec3;
+}
 .quiz:hover {
   box-shadow: 0 0 15px 8px rgba(255, 251, 0, 0.372);
 }
 @media (max-width: 768px) {
   .quiz {
-    width: 90vw;
-    padding: 1rem;
+    margin-top: 12em;
+    width: 82vw;
+    padding: 0.5rem;
     font-size: 0.9rem;
   }
-
+  .cta{
+    font-size: 0.9rem;
+    padding: 0rem 0rem 0rem 0rem;
+  }
   .quiz-category {
     font-size: 1.5rem;
   }
@@ -517,7 +560,7 @@ h1 {
 #modal h2 {
   font-family: 'Arial', sans-serif;
   font-size: 1.5em;
-  margin-bottom: 20px;
+  margin-bottom: 1em;
   text-align: center;
   color: #4CAF50;
 }
@@ -565,6 +608,17 @@ h1 {
 #modal:hover {
   transform: translate(-50%, -52%) scale(1.02);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+@media (max-width: 768px) {
+  #modal {
+    width: 92%;
+    height: 62%;
+    margin-top: 8em;
+  }
+
+  #modal h2 {
+    font-size: 1em;
+  }
 }
 
 
