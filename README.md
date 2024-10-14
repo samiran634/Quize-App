@@ -1,5 +1,7 @@
 Get Ready to Quiz!
 Play the quiz by just clicking here also -->https://quize-app-qan3.onrender.com/
+
+
 OTHERWISE-->
 
 Run the App Locally and Showcase Your Knowledge!
@@ -36,7 +38,7 @@ nodemon .\app.js
 
 You're All Set!
 
-Open your browser and navigate to http://localhost:80 (or the specified port) to access the quiz game.
+Open your browser and navigate to http://localhost:4000 (or the specified port) to access the quiz game.
 
 What to Expect:
 
