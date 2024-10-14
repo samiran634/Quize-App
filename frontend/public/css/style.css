@@ -285,6 +285,13 @@ h1 {
 .hide {
   display: none;
 }
+.container-category{
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .quiz {
   background-color: #94a3b8;
@@ -303,6 +310,31 @@ h1 {
 .quiz:hover {
   box-shadow: 0 0 15px 8px rgba(255, 251, 0, 0.372);
 }
+@media (max-width: 768px) {
+  .quiz {
+    width: 90vw;
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .quiz-category {
+    font-size: 1.5rem;
+  }
+
+  .questions-container {
+    font-size: 1.2rem;
+  }
+
+  .options-contianer .button {
+    font-size: 1rem;
+    padding: 8px 0;
+  }
+
+  .cta {
+    font-size: 1rem;
+  }
+}
+
 
 .result {
   position: absolute;

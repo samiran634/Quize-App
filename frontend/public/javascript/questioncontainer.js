@@ -17,6 +17,7 @@ export default function QuestionContainer(container, containerzes, resultcontain
     // Create initial UI
     const containerCategory = document.createElement('span');
     containerCategory.classList.add('container-category');
+    containerCategory.innerText = containerzes[currentQuestion].category;
     container.appendChild(containerCategory);
 
     const countContainer = document.createElement('div');
