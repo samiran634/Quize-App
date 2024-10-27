@@ -13,7 +13,7 @@ Step 1: Clone the Repository
 Clone this repository using Git:
 
 bash
-git clone (link unavailable)](https://github.com/samiran634/Quize-App.git)
+git clone https://github.com/samiran634/Quize-App.git
 
 Step 2: Install Dependencies
 
