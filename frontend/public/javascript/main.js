@@ -17,19 +17,20 @@ window.addEventListener('load', function () {
 import category_container from "./catagory.js";
 import quizedata from "./questionpakege.js";
 import QuestionContainer from "./questioncontainer.js";
-document.querySelector(".btn").addEventListener("click"||"keyframes",(event)=>{
-  event.preventDefault();
-  if(event.target.dataset.id==='play-solo'){
-    document.querySelector(".popupbox").classList.add("hidden");
-  }else if(event.target.dataset.id==='play-dual'){
-    location.href='/dule';
-  }
-})
+
 // Variables for DOM elements
 let mainContainer, bgContainer, box, playBtn, quizContainer, resultContainer,flexcontainer;
 let index, num, catagotystring;
 let menuBtnopen ;
 window.addEventListener('DOMContentLoaded', () => {
+  document.querySelector(".btn").addEventListener("click" ,(event)=>{
+    event.preventDefault();
+    if(event.target.dataset.id==='play-solo'){
+      document.querySelector(".popupbox").classList.add("hidden");
+    }else if(event.target.dataset.id==='play-dual'){
+      location.href='/dule';
+    }
+  })
   initDOMElements();
 
   if (mainContainer && bgContainer && playBtn && quizContainer && resultContainer) {

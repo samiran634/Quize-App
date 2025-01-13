@@ -3,15 +3,21 @@ const cookieparser = require('../node_modules/cookie-parser');
 const path = require('../node_modules/path');
 const bcrypt = require("../node_modules/bcrypt");
 const jwt = require("../node_modules/jsonwebtoken");
+const cors=require( "cors");
 require('../node_modules/dotenv').config();
-
+const corsoption={
+  origin:["https://quize-app-qan3.onrender.com","https://git-3wi2.onrender.com/"],
+  methods: ['GET', 'POST'],
+  credentials: true,
+  serverSuccessStatus:200,
+}
 // Import custom modules
 const { connectToDatabase, getCollection, closeConnection } = require('./playermodle.js');
 
 // Initialize express app
 const app = express();
 const PORT = process.env.PORT || 4000;
-
+app.use(cors(corsoption));
 // Middleware setup
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -64,7 +70,9 @@ app.get("/", (req, res) => {
   }
   res.render("index");
 });
-
+app.get('/duel',(req,res)=>{
+  res.redirect("https://git-3wi2.onrender.com/")
+})
 // Login route
 app.get("/login", (req, res) => {
   res.render("login");
