@@ -1,10 +1,10 @@
-const express = require("../node_modules/express");
-const cookieparser = require('../node_modules/cookie-parser');
-const path = require('../node_modules/path');
-const bcrypt = require("../node_modules/bcrypt");
-const jwt = require("../node_modules/jsonwebtoken");
-const cors=require( "cors");
-require('../node_modules/dotenv').config();
+const express = require("express");
+const cookieparser = require('cookie-parser');
+const path = require('path');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cors = require("cors");
+require('dotenv').config();
 const corsoption={
   origin:["https://quize-app-qan3.onrender.com","https://git-3wi2.onrender.com/"],
   methods: ['GET', 'POST'],

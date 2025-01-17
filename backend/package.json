@@ -8,6 +8,11 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "nodemon": "^3.1.9"
+  },
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js"
   }
 }
