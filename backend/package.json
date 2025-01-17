@@ -2,9 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "app.js",
- 
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
 }

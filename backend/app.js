@@ -3,6 +3,7 @@ const cookieparser = require('../node_modules/cookie-parser');
 const path = require('../node_modules/path');
 const bcrypt = require("../node_modules/bcrypt");
 const jwt = require("../node_modules/jsonwebtoken");
+const cors=require("../node_modules/cors");
 require('../node_modules/dotenv').config();
 
 // Import custom modules
@@ -13,6 +14,11 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Middleware setup
+app.use(cors({
+  origin: ['https://git-3wi2.onrender.com', 'https://quize-app-qan3.onrender.com'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../frontend/public')));
