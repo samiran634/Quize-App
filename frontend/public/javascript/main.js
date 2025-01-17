@@ -27,8 +27,9 @@ window.addEventListener('DOMContentLoaded', () => {
     event.preventDefault();
     if(event.target.dataset.id==='play-solo'){
       document.querySelector(".popupbox").classList.add("hidden");
-    }else if(event.target.dataset.id==='play-dual'){
-      location.href='/dule';
+    }else if(event.target.dataset.id === 'play-dule') {
+      console.log('Duel button clicked');
+      location.href = '/duel';
     }
   })
   initDOMElements();
