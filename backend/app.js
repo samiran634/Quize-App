@@ -19,11 +19,16 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 app.use(cors(corsoption));
 // Middleware setup
-app.use(cors({
-  origin: ['https://git-3wi2.onrender.com', 'https://quize-app-qan3.onrender.com'],
+const corsOptions = {
+  origin: [
+    'https://quize-app-qan3.onrender.com',
+    'https://git-3wi2.onrender.com'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../frontend/public')));
@@ -75,9 +80,7 @@ app.get("/", (req, res) => {
   }
   res.render("index");
 });
-app.get('/duel',(req,res)=>{
-  res.redirect("https://git-3wi2.onrender.com/")
-})
+
 // Login route
 app.get("/login", (req, res) => {
   res.render("login");
@@ -182,7 +185,22 @@ app.get('/profile', isLoggedIn, async (req, res) => {
     res.status(500).send('Server error');
   }
 });
-
+app.get('/duel', isLoggedIn, async(req, res) => {
+  try {
+    // Create a new token specifically for the duel site
+    const duelToken = jwt.sign(
+      { userEmail: req.user.userEmail },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+    
+    // Redirect with the token as a query parameter
+    res.redirect(`https://git-3wi2.onrender.com/?token=${duelToken}`);
+  } catch (error) {
+    console.error('Error creating duel token:', error);
+    res.status(500).send('Error accessing duel mode');
+  }
+});
 // Update score route
 app.post('/updatescore', authenticateToken, async (req, res) => {
   console.log('Reached /updatescore route');
@@ -270,7 +288,7 @@ app.post('/updatepassword', authenticateToken, async (req, res) => {
 
 // Forget password route (renders reset password page)
 app.get('/resetpassword', (req, res) => {
-  res.render('resetpassword');  // Fixed typo in 'resetpassword'
+  res.render('resetpassword');   
 });
 
 // Forget password POST route
