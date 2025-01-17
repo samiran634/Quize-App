@@ -23,6 +23,14 @@ let mainContainer, bgContainer, box, playBtn, quizContainer, resultContainer,fle
 let index, num, catagotystring;
 let menuBtnopen ;
 window.addEventListener('DOMContentLoaded', () => {
+  document.querySelector(".btn").addEventListener("click" ,(event)=>{
+    event.preventDefault();
+    if(event.target.dataset.id==='play-solo'){
+      document.querySelector(".popupbox").classList.add("hidden");
+    }else if(event.target.dataset.id==='play-dual'){
+      location.href='/dule';
+    }
+  })
   initDOMElements();
 
   if (mainContainer && bgContainer && playBtn && quizContainer && resultContainer) {

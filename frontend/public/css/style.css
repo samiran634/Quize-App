@@ -631,4 +631,24 @@ h1 {
 .margin-vertical {
   margin-top: 1em;
 }
-
+.notification-box{
+  display: flex;
+  justify-content: center;
+  animation: blink infinite;
+}
+@keyframes blink {
+  
+}
+.popupbox{
+  width:60%;
+  height: 40%;
+  border-radius: 2em;
+  color: black;
+  background-image:linear-gradient(right,blue,to left,silver) ;
+  padding: 1em;
+  margin-top:2em;
+  z-index: 9999;
+}
+.hidden{
+  display: none;
+}
