@@ -45,140 +45,9 @@
     </button>
   </div>
 </div>
-
-<style>
-  .popupbox {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    width: 90%;
-    margin: 2rem auto;
-    text-align: center;
-    backdrop-filter: blur(10px);
-    border: 2px solid #4CAF50;
-    animation: fadeIn 0.5s ease-out;
-    z-index: 9999;
-    position: fixed;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .popup-title {
-    color: #2C3E50;
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-  }
-
-  .popup-subtitle {
-    color: #666;
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  .popup-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    align-items: center;
-  }
-
-  .popup-btn {
-    background: #4CAF50;
-    color: white;
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 50px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    width: 80%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    font-family: 'Poppins', sans-serif;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .popup-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      120deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent
-    );
-    transition: 0.5s;
-  }
-
-  .popup-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 7px 14px rgba(76, 175, 80, 0.2);
-    background: #45a049;
-  }
-
-  .popup-btn:hover::before {
-    left: 100%;
-  }
-
-  .popup-btn:active {
-    transform: translateY(1px);
-  }
-
-  .btn-icon {
-    font-size: 1.3rem;
-  }
-
-  /* Different colors for duel button */
-  .popup-btn[data-id="play-dule"] {
-    background: #FF6B6B;
-  }
-
-  .popup-btn[data-id="play-dule"]:hover {
-    background: #ff5252;
-    box-shadow: 0 7px 14px rgba(255, 107, 107, 0.2);
-  }
-
-  @media (max-width: 768px) {
-    .popupbox {
-      padding: 1.5rem;
-      margin: 1rem auto;
-    }
-
-    .popup-title {
-      font-size: 1.5rem;
-    }
-
-    .popup-subtitle {
-      font-size: 1rem;
-    }
-
-    .popup-btn {
-      padding: 0.8rem 1.5rem;
-      font-size: 1rem;
-    }
-  }
-</style>
+<div class="duel-button" onclick="window.location.href='/duel'">
+  Duel Mode
+</div>
   <div class="app">
     <div class=" flex-container rule-book">
            <div class="big-container section-rule-box" style="display: flex;justify-content: center;flex-direction: column;" >
@@ -270,3 +139,61 @@
  
 </body>
 </html>
+
+<style>
+  .duel-button {
+    position: fixed;
+    right: 20px;
+    bottom: 40px;
+    background: linear-gradient(45deg, #FF6B6B, #FF006E);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 25px 0 0 25px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    animation: pulse 2s infinite, float 3s ease-in-out infinite;
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+
+  .duel-button:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+    background: linear-gradient(45deg, #FF006E, #FF6B6B);
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+    }
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .duel-button {
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      right: 10px;
+      bottom: 30px;
+    }
+  }
+</style>
