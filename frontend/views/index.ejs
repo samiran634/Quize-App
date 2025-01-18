@@ -48,33 +48,18 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     z-index: 100;
     transition: all 0.3s ease;
+    box-sizing: border-box;
   }
 
   @keyframes backgroundChange {
-    0% {
-      background-color: #FF6B6B;  /* Red */
-    }
-    14% {
-      background-color: #4ECDC4;  /* Teal */
-    }
-    28% {
-      background-color: #45B7D1;  /* Blue */
-    }
-    42% {
-      background-color: #96CEB4;  /* Green */
-    }
-    56% {
-      background-color: #FFBE0B;  /* Yellow */
-    }
-    70% {
-      background-color: #FF006E;  /* Pink */
-    }
-    84% {
-      background-color: #8338EC;  /* Purple */
-    }
-    100% {
-      background-color: #FF6B6B;  /* Back to Red */
-    }
+    0% { background-color: #FF6B6B; }
+    14% { background-color: #4ECDC4; }
+    28% { background-color: #45B7D1; }
+    42% { background-color: #96CEB4; }
+    56% { background-color: #FFBE0B; }
+    70% { background-color: #FF006E; }
+    84% { background-color: #8338EC; }
+    100% { background-color: #FF6B6B; }
   }
 
   .notification-box:hover {
@@ -82,10 +67,34 @@
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   }
 
+  /* Mobile Styles */
   @media (max-width: 768px) {
     .notification-box {
-      padding: 10px;
+      padding: 12px 15px;
       font-size: 0.9rem;
+      margin-top: 1em; /* Added space below mobile navbar */
+      line-height: 1.4;
+      width: 100%;
+      left: 0;
+      right: 0;
+    }
+  }
+
+  /* Small Mobile Styles */
+  @media (max-width: 480px) {
+    .notification-box {
+      padding: 10px;
+      font-size: 0.85rem;
+      margin-top: 1.5em;
+    }
+  }
+
+  /* Handle very small screens */
+  @media (max-width: 320px) {
+    .notification-box {
+      padding: 8px;
+      font-size: 0.8rem;
+      margin-top: 1.5em;
     }
   }
 </style>
@@ -93,8 +102,6 @@
     <div class=" flex-container rule-book">
            <div class="big-container section-rule-box" style="display: flex;justify-content: center;flex-direction: column;" >
           <div class="rules">
- 
-
         </div>
       </div>
 
@@ -117,7 +124,7 @@
 
 <button class="play-btn cursor hide" style="justify-self: center;">
     Let the game begin
-    <span role="img" aria-label="fire">
+    <span role="img" aria-label="fire">3
       🔥🔥
     </span>
 </button>

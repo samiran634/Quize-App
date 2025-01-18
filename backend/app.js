@@ -26,7 +26,8 @@ const corsOptions = {
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'token'],
+  exposedHeaders: ['token'],
 };
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -40,14 +41,19 @@ app.set('view engine', 'ejs');
 
 // Authentication middleware
 function authenticateToken(req, res, next) {
-  const token = req.cookies.token;  // JWT stored in the cookie
+  // Check token in multiple places
+  const token = req.headers.authorization?.split(' ')[1] || // Bearer token
+               req.headers.token || // Custom token header
+               req.cookies.token;  // Cookie token
+
   if (!token) {
     return res.status(401).send('Access denied. No token provided.');
   }
+
   try {
     // Verify the token and decode the user info
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;  // Store the user data (e.g., id, email) in the request object
+    req.user = decoded;
     next();
   } catch (err) {
     res.status(400).send('Invalid token.');
@@ -56,10 +62,14 @@ function authenticateToken(req, res, next) {
 
 // Middleware to check if a user is logged in
 const isLoggedIn = (req, res, next) => {
-  const token = req.cookies.token;
+  const token = req.headers.authorization?.split(' ')[1] ||
+                req.headers.token ||
+                req.cookies.token;
+
   if (!token) {
     return res.redirect('/login');
   }
+  
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
@@ -187,14 +197,16 @@ app.get('/profile', isLoggedIn, async (req, res) => {
 });
 app.get('/duel', isLoggedIn, async(req, res) => {
   try {
-    // Create a new token specifically for the duel site
     const duelToken = jwt.sign(
       { userEmail: req.user.userEmail },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
     
-    // Redirect with the token as a query parameter
+    // Set token in response header
+    res.set('token', duelToken);
+    
+    // Redirect with token in query and header
     res.redirect(`https://git-3wi2.onrender.com/?token=${duelToken}`);
   } catch (error) {
     console.error('Error creating duel token:', error);
