@@ -185,7 +185,7 @@ app.get('/dashboard', isLoggedIn, (req, res) => {
 });
 
 // Profile route (fetching user data)
-app.get('/profile', isLoggedIn, async (req, res) => {
+app.get('/profile', async (req, res) => {
   try {
     const usersCollection = getCollection('users');
     const user = await usersCollection.findOne({ userEmail: req.user.userEmail });
