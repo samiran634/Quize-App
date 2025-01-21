@@ -11,6 +11,7 @@ const corsoption={
   credentials: true,
   serverSuccessStatus:200,
 }
+let username;
 // Import custom modules
 const { connectToDatabase, getCollection, closeConnection } = require('./playermodle.js');
 
@@ -125,7 +126,7 @@ app.post('/create', async (req, res) => {
       logintime: new Date().toISOString(),
       rank: existingUsers + 1
     };
-
+    username=name;
     const result = await usersCollection.insertOne(newUser);
 
     const token = jwt.sign({ userEmail }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -207,7 +208,7 @@ app.get('/duel', isLoggedIn, async(req, res) => {
     res.set('token', duelToken);
     
     // Redirect with token in query and header
-    res.redirect(`https://git-3wi2.onrender.com/?token=${duelToken}`);
+    res.redirect(`https://git-3wi2.onrender.com/?token=${duelToken}&name=${username}`);
   } catch (error) {
     console.error('Error creating duel token:', error);
     res.status(500).send('Error accessing duel mode');
