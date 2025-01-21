@@ -204,10 +204,10 @@ app.get('/duel', isLoggedIn, async(req, res) => {
       { expiresIn: '1h' }
     );
     
-    // Set token in response header
+ 
     res.set('token', duelToken);
-    
-    // Redirect with token in query and header
+     
+    console.log(username);
     res.redirect(`https://git-3wi2.onrender.com/?token=${duelToken}&name=${username}`);
   } catch (error) {
     console.error('Error creating duel token:', error);
