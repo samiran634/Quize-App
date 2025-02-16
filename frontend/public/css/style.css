@@ -6,13 +6,61 @@ body, html {
  
   background-image:linear-gradient(to right,black ,rgb(47, 125, 47));
 }
+ 
+@keyframes backgroundChange {
+  0% { background-color: #FF6B6B; }
+  14% { background-color: #4ECDC4; }
+  28% { background-color: #45B7D1; }
+  42% { background-color: #96CEB4; }
+  56% { background-color: #FFBE0B; }
+  70% { background-color: #FF006E; }
+  84% { background-color: #8338EC; }
+  100% { background-color: #FF6B6B; }
+}
 
+.notification-box:hover {
+  transform: translateY(2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .notification-box {
+    padding: 12px 15px;
+    font-size: 0.9rem;
+    margin-top: 1em; /* Added space below mobile navbar */
+    line-height: 1.4;
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+  .notification-box {
+    padding: 10px;
+    font-size: 0.85rem;
+    margin-top: 1.5em;
+  }
+}
+
+/* Handle very small screens */
+@media (max-width: 320px) {
+  .notification-box {
+    padding: 8px;
+    font-size: 0.8rem;
+    margin-top: 1.5em;
+  }
+}
 #scene-container {
   width: 100%;
   height: 100%;
 }
  
-
+.flex{
+  display: flex;
+}
 h1 {
   color: #2600ff;
   padding-top: 2rem;
@@ -27,7 +75,12 @@ h1 {
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
 }
-
+.deficulty-container{
+  display: flex;
+  gap:2em;
+  padding:1rem;
+  margin-left:1em ;
+}
 .flex-container:hover {
   transform: scale(1.02);
   box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
@@ -837,4 +890,99 @@ h1 {
     right: 10px;
     bottom: 30px;
   }
+}
+
+.difficulty-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.difficulty-card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.3s ease;
+  width: 100%;
+  max-width: 200px;
+}
+
+.difficulty-card img {
+  width: 100%;
+  height: auto;
+}
+
+.difficulty-card:hover {
+  transform: scale(1.05);
+}
+
+.difficulty-card p {
+  margin: 0;
+  padding: 1rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+.card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  width: 100%;
+  max-width: 400px;
+  margin: 1rem 0;
+}
+
+.card-container:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-image {
+  width: 30%;
+  height: auto;
+  border-radius: 10px 0 0 10px;
+}
+
+.card-content {
+  padding: 1rem;
+  flex: 1;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.card-subtitle {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.card-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.card-button:hover {
+  background-color: #45a049;
 }

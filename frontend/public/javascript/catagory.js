@@ -22,59 +22,42 @@ let arrayOfCategories = [
     for (let ele of arrayOfCategories) {
       indexTracking++;
       
-      // Create the input container
-      let input_container = document.createElement("div");
-      input_container.style.cssText = `
+      // Create the btns
+      let button = document.createElement("button");
+      button.style.cssText = `
         display: flex; 
         flex-direction: row; 
         align-items: center;
         width: 30%; /* Ensures 3 items per row */
         height:3em;
-        padding: .5 em;
+        padding: .5em;
         margin:.5em;
         background-color: black;
         border-radius: 8px;
         transition: transform 0.3s ease, background-color 0.3s ease;
         color:white;
-      `;
-      
-      // Add hover effect for a "cool" style
-      input_container.onmouseover = () => {
-        input_container.style.transform = "scale(1.05)";
-        input_container.style.backgroundColor = "#e0e0e0";
-      };
-      input_container.onmouseout = () => {
-        input_container.style.transform = "scale(1)";
-        input_container.style.backgroundColor = "black";
-      };
-  
-      // Create the input element
-      let input = document.createElement("input");
-      input.setAttribute("id", `${indexTracking}`);
-      input.setAttribute("data-id", `${indexTracking}`);
-      input.setAttribute("data-name", ele);
-      input.setAttribute("type", "radio");
-      input.setAttribute("data-key","catagory");
-      // Create the label element
-      let label = document.createElement("label");
-      label.setAttribute("for", `${indexTracking}`);
-      label.setAttribute("data-id", `${indexTracking}`);
-      label.setAttribute("data-name", ele);
-      label.setAttribute("data-key","catagory");
-      label.style.cssText = `
-        cursor: pointer; 
-        margin-left: 10px; 
+        cursor: pointer;
         font-weight: bold;
         font-size: 0.9rem;
       `;
-      label.innerText = ele;
-  
-      // Append the input and label to the input container
-      input_container.appendChild(input);
-      input_container.appendChild(label);
-  
-      // Append the input container to the block
-      block.appendChild(input_container);
+      button.setAttribute("data-id", `${indexTracking}`);
+      button.setAttribute("data-name", ele);
+      button.setAttribute("data-key","catagory");
+      button.setAttribute("class","catagory-btn");
+      button.innerText = ele;
+
+      // Add hover effect for a "cool" style
+      button.onmouseover = () => {
+        button.style.transform = "scale(1.05)";
+        button.style.backgroundColor = "#e0e0e0";
+      };
+      button.onmouseout = () => {
+        button.style.transform = "scale(1)";
+        button.style.backgroundColor = "black";
+      };
+
+      // Append the button to the block
+      block.appendChild(button);
     }
   
     return block;

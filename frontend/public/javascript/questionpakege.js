@@ -1,4 +1,4 @@
-export default function quizedata(noOfQuestion, catagoryind) {
+export default function quizedata(noOfQuestion, catagoryind,mode) {
 
   if (noOfQuestion === 0) noOfQuestion = 10;
 
@@ -17,12 +17,15 @@ export default function quizedata(noOfQuestion, catagoryind) {
 
   let baseURL = `https://opentdb.com/api.php?amount=${noOfQuestion}`;
   
-  if (catagoryind !== undefined) {
-      let URL = `${baseURL}&category=${catagoryind}`;  // Correct 'catagory' to 'category'
+  if (catagoryind !== undefined&&catagoryind>0) {
+      let URL = `${baseURL}&category=${catagoryind}&difficulty=${mode}`;  
       let data=fetchData(URL);
+      console.log(data,catagoryind);
       return data;
   } else {
-      let data=fetchData(baseURL);
+    let URL=`${baseURL}&difficulty=${mode}`;
+      let data=fetchData(URL);
+      console.log(data)
       return data;
   }
 

@@ -119,10 +119,6 @@ function createRankingTable() {
     });
 
     tbody.appendChild(row);
-
-
-    
-    
   });
   // Create a container for the button
   const buttonContainer = document.createElement('div');
@@ -164,6 +160,11 @@ function createRankingTable() {
   // Append the button container to the main container
   container.appendChild(buttonContainer);
 
-  // Append the container to the body
-  document.body.appendChild(container);
+  // Append the container to the ranking-container in the DOM
+  const rankingContainer = document.querySelector('.ranking-container');
+  if (rankingContainer) {
+    rankingContainer.appendChild(container);
+  } else {
+    console.error('Ranking container not found.');
+  }
 }

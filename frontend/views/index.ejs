@@ -18,7 +18,7 @@
  
 <nav class="navbar d-flex justify-space-between">
 
-  <h1 class="navbar-title">Quiz App</h1>
+  <h1 class="navbar-title" ><a href="/">Quiz App</a></h1>
   <div class="navbar-links">
       <a href="/login" id="login-link" class="nav-link">Login</a>
       <a href="/ranktable" id="dashboard-link" class="nav-link">RankTable</a>
@@ -50,53 +50,6 @@
     transition: all 0.3s ease;
     box-sizing: border-box;
   }
-
-  @keyframes backgroundChange {
-    0% { background-color: #FF6B6B; }
-    14% { background-color: #4ECDC4; }
-    28% { background-color: #45B7D1; }
-    42% { background-color: #96CEB4; }
-    56% { background-color: #FFBE0B; }
-    70% { background-color: #FF006E; }
-    84% { background-color: #8338EC; }
-    100% { background-color: #FF6B6B; }
-  }
-
-  .notification-box:hover {
-    transform: translateY(2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  }
-
-  /* Mobile Styles */
-  @media (max-width: 768px) {
-    .notification-box {
-      padding: 12px 15px;
-      font-size: 0.9rem;
-      margin-top: 1em; /* Added space below mobile navbar */
-      line-height: 1.4;
-      width: 100%;
-      left: 0;
-      right: 0;
-    }
-  }
-
-  /* Small Mobile Styles */
-  @media (max-width: 480px) {
-    .notification-box {
-      padding: 10px;
-      font-size: 0.85rem;
-      margin-top: 1.5em;
-    }
-  }
-
-  /* Handle very small screens */
-  @media (max-width: 320px) {
-    .notification-box {
-      padding: 8px;
-      font-size: 0.8rem;
-      margin-top: 1.5em;
-    }
-  }
 </style>
   <div class="app">
     <div class=" flex-container rule-book">
@@ -106,9 +59,9 @@
       </div>
 
 </div>
-<div   class="d-flex" style="justify-content: center;">
+<div   class="d-flex " style="justify-content: center;">
   <div id="modal" class="hide d-flex" style ="justify-content: center;position: absolute; justify-self: center; flex-direction: column;border: greenyellow solid .2em ;border-radius: 1rem;"><h2 class="rule-title d-flex" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">enter no of questions you want to solve</h2>
-  <input type="number" placeholder="enter numbers" class="d-flex" style="border-radius:1rem ;height:4em;justify-content: center;justify-items: center"><span class="d-flex" style="justify-content: center;"><button class="circular-btn cursor" style="align-self: center; font-size: larger;font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" data-name="submit-btn">submit</button></span>
+  <input type="number" placeholder="enter numbers" class="d-flex inputbox" style="border-radius:1rem ;height:4em;justify-content: center;justify-items: center cl"><span class="d-flex" style="justify-content: center;"><button class="circular-btn cursor" style="align-self: center; font-size: larger;font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" data-name="submit-btn">submit</button></span>
   </div>
   </div>
   </div>
@@ -124,7 +77,7 @@
 
 <button class="play-btn cursor hide" style="justify-self: center;">
     Let the game begin
-    <span role="img" aria-label="fire">3
+    <span role="img" aria-label="fire">
       🔥🔥
     </span>
 </button>

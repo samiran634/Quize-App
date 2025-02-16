@@ -210,7 +210,7 @@ export default function QuestionContainer(container, containerzes, resultcontain
 
     // Timer function
     function startTimer() {
-        let timeLeft = 10;
+        let timeLeft = 5;
         timerElement.textContent = timeLeft;
         timerElement.style.display = 'block';
         loadingMessage.style.display = 'block';

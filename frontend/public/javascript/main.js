@@ -10,28 +10,33 @@ window.addEventListener('load', function () {
       document.querySelector('.overlay').style.display = 'none';
     } else {
       console.error('Database failed to load');
-      // You might want to show an error message to the user here
+      alert("database not loaded");
     }
   });
 });
 import category_container from "./catagory.js";
 import quizedata from "./questionpakege.js";
 import QuestionContainer from "./questioncontainer.js";
-
 // Variables for DOM elements
-let mainContainer, bgContainer, box, playBtn, quizContainer, resultContainer,flexcontainer;
-let index, num, catagotystring;
-let menuBtnopen ;
+let mainContainer, bgContainer, box, playBtn, quizContainer, resultContainer,diffcontainer;
+let index, num,catagotystring;
+let menuBtnopen,level="easy" ;
 window.addEventListener('DOMContentLoaded', () => {
-  document.querySelector(".popup-buttons").addEventListener("click" ,(event)=>{
-    event.preventDefault();
-    if(event.target.dataset.id==='play-solo'){
-      document.querySelector(".popupbox").classList.add("hidden");
-    }else if(event.target.dataset.id === 'play-dule') {
-      console.log('Duel button clicked');
-      location.href = '/duel';
-    }
-  })
+  // Check if user is logged in
+  const isLoggedIn = /* Replace with actual authentication check */ true;
+
+  if (isLoggedIn) {
+    document.querySelector(".popup-buttons").addEventListener("click", (event) => {
+      event.preventDefault();
+      if (event.target.dataset.id === 'play-solo') {
+        document.querySelector(".popupbox").classList.add("hidden");
+      } else if (event.target.dataset.id === 'play-dule') {
+        console.log('Duel button clicked');
+        location.href = '/duel';
+      }
+    });
+  }
+
   initDOMElements();
 
   if (mainContainer && bgContainer && playBtn && quizContainer && resultContainer) {
@@ -72,8 +77,8 @@ function initDOMElements() {
   if (!resultContainer) {
     console.error('Result container not found!');
   }
-  flexcontainer=document.querySelector('.flex-container');
-  if(!flexcontainer){
+  diffcontainer=document.querySelector('.flex-container');
+  if(!diffcontainer){
     console.error('flexcontainer not found!');
   }
   menuBtnopen=document.getElementById("menu-open-btn");
@@ -83,7 +88,7 @@ function initDOMElements() {
  
 }
 initDOMElements();
-
+//makeing guidlines
 function createGuidelines() {
   const guidelinesContainer = document.createElement('div');
   guidelinesContainer.className = 'rules container';
@@ -132,8 +137,7 @@ function createGuidelines() {
 
   return guidelinesContainer;
 }
-console.log(mainContainer)
-// Usage
+ 
 const guidelinesSection = createGuidelines();
 mainContainer.appendChild(guidelinesSection);
 
@@ -143,6 +147,7 @@ mainContainer.addEventListener("click",(event)=>{
     chooseCategory()
   }
 })
+//for small devices
 menuBtnopen.addEventListener("click", () => {
  
   menuBtnopen.classList.toggle("hide");
@@ -180,73 +185,154 @@ function chooseCategory() {
 
   bgContainer.appendChild(category_container(categoryListContainer));
 
-  let sub_btn = document.createElement("button");
-  sub_btn.textContent = "Submit";
-  sub_btn.classList.add("circular-btn");
-  sub_btn.setAttribute("style", "width:12rem;align-self:center;color:black;height:3em;color:black");
-  sub_btn.setAttribute("data-name", "submit");
-
-  bgContainer.appendChild(sub_btn);
-
   bgContainer.addEventListener("click", handleBgContainerClick);
 }
 
 function handleBgContainerClick(event) {
   console.log(event.target);
   if (event.target.id) {
-    catagotystring = event.target.dataset.name;
+     catagotystring = event.target.dataset.name;
   }
   if (event.target.dataset.key === "catagory") {
-    index = event.target.id;
-  }
-  if (event.target.dataset.name === "submit") {
+    index = event.target.dataset.id-1;
+    console.log("index value",index);
     bgContainer.innerHTML = "";
-    box.classList.remove("hide");
-    flexcontainer.classList.add("hide");
-    box.addEventListener("keyup", handleBoxKeyup);
-  }
-}
-
-function handleBoxKeyup(event) {
-  num = Number(event.target.value);
-  if (num > 50 || num < 0 || isNaN(num)) {
-    alert("Invalid Input");
-  } else {
-    box.addEventListener("click", handleBoxClick);
+    createDeficultyInputContainer();
+  
   }
 }
 
 function handleBoxClick(event) {
+  let inputBox=document.querySelector(".inputbox")  ;
+  console.log(inputBox)
   if (event.target.dataset.name === "submit-btn") {
-    box.classList.add("hide");
-    playBtn.classList.remove("hide");
-    playBtn.addEventListener("click", startQuiz);
+    const inputValue =  Number(inputBox.value);
+    console.log(inputValue)
+    if (inputValue > 50 || inputValue < 1 || isNaN(inputValue)) {
+      alert("Invalid Input: Please enter a number between 1 and 50.");
+    } else {
+      num=inputValue;
+      box.classList.add("hide");
+      playBtn.classList.remove("hide");
+      setTimeout(() => {
+        startQuiz();
+      }, 3000);
+    }
   }
 }
- 
+
 function startQuiz() {
   quizContainer.classList.remove("hide");
   playBtn.classList.add("hide");
 
-  async function loadQuiz(num, index) {
+  async function loadQuiz(num, index,mode) {
     try {
-      let data = await quizedata(num, index - 1);
+      let data = await quizedata(num, index - 1,mode);
+     
+
+      if (!Array.isArray(data) || !data.length || !data[0].hasOwnProperty('category')) {
+        throw new Error('Invalid data structure: Expected an array of objects with a category property.');
+      }
       QuestionContainer(quizContainer, data, resultContainer);
     } catch (error) {
       console.error('Error fetching quiz data:', error);
+      alert('Failed to load quiz data. Please try again later.'); // Notify user of the error
     }
   }
 
-  loadQuiz(num, index);
+  loadQuiz(num, index,level);
 }
- 
+function createDeficultyInputContainer(){
+   
+    if(!diffcontainer){
+      console.error('deficultyContainer not found!');
+    }else{
+     const items=[
+      {
+        text:"easy",
+        subtitle:"don't worry about it, all are chilld level questions",
+        Image:"/assects/level1.gif"
+      },
+      {
+        text:"medium",
+        subtitle:"If you feel like big boy than come and try to answer",
+        Image:"/assects/level2.gif"
+      },
+      {
+        text:"hard",
+        subtitle:"At your own risk buddy. those questions are pritty unpredicted",
+         Image:"/assects/level3.gif"
+      }
+     ];
+     items.map((item)=> {
+       createCard(diffcontainer,item.text,item.subtitle,item.Image);
+     });
+     
+  }
+}
+
+function handleDifficultyClick(event){
+  console.log(event);
+    level=event.target.dataset.key;
+    if(level){
+    diffcontainer.classList.add("hide");
+    box.classList.remove("hide");
+    box.addEventListener("click", handleBoxClick);
+     console.log(level);
+    }else{
+      alert("please touch the buttons carefully!!!")
+    }
+}
+
+function createCard(container ,Title ,subTitle,Image) {
+  const cardContainer = document.createElement("div");
+  cardContainer.className = "card-container";
+  
+
+  const img = document.createElement("img");
+  img.className = "card-image";
+  img.src =  Image;
+  img.alt = "gif missing for you";
+
+  const cardContent = document.createElement("div");
+  cardContent.className = "card-content";
+
+  const title = document.createElement("h5");
+  title.className = "card-title";
+  title.textContent =  Title;
+
+  const subtitle = document.createElement("p");
+  subtitle.className = "card-subtitle";
+  subtitle.textContent =  subTitle;
+
+  const button = document.createElement("button");
+  button.className = "card-button";
+  button.dataset.key=Title;
+  button.addEventListener("click",  handleDifficultyClick);
+  button.textContent = "Go for it";
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "arrow-icon"); 
+  svg.setAttribute("viewBox", "0 0 14 10");
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("aria-hidden", "true");
+
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("stroke", "currentColor");
+  path.setAttribute("stroke-linecap", "round");
+  path.setAttribute("stroke-linejoin", "round");
+  path.setAttribute("stroke-width", "2");
+  path.setAttribute("d", "M1 5h12m0 0L9 1m4 4L9 9");
+
+  svg.appendChild(path);
+  button.appendChild(svg);
+  cardContent.appendChild(title);
+  cardContent.appendChild(subtitle);
+  cardContent.appendChild(button);
+  cardContainer.appendChild(img);
+  cardContainer.appendChild(cardContent);
+
+  container.appendChild(cardContainer);
+}
 
  
-
-
-
-
-
-
-
-
