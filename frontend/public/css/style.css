@@ -125,10 +125,12 @@ h1 {
 
  .button.circular-btn.success {
   background-color: green;
+  color: white;
 }
 
  .button.circular-btn.error {
   background-color: red;
+  color: black;
 }
 .navbar-links{
   display: flex;

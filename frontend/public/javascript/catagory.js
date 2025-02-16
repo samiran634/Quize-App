@@ -35,7 +35,7 @@ let arrayOfCategories = [
         background-color: black;
         border-radius: 8px;
         transition: transform 0.3s ease, background-color 0.3s ease;
-        color:white;
+        color:green;
         cursor: pointer;
         font-weight: bold;
         font-size: 0.9rem;

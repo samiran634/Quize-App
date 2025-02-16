@@ -311,21 +311,11 @@ function createCard(container ,Title ,subTitle,Image) {
   button.addEventListener("click",  handleDifficultyClick);
   button.textContent = "Go for it";
 
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("class", "arrow-icon"); 
-  svg.setAttribute("viewBox", "0 0 14 10");
-  svg.setAttribute("fill", "none");
-  svg.setAttribute("aria-hidden", "true");
+ 
 
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("stroke", "currentColor");
-  path.setAttribute("stroke-linecap", "round");
-  path.setAttribute("stroke-linejoin", "round");
-  path.setAttribute("stroke-width", "2");
-  path.setAttribute("d", "M1 5h12m0 0L9 1m4 4L9 9");
-
-  svg.appendChild(path);
-  button.appendChild(svg);
+ 
+   
+ 
   cardContent.appendChild(title);
   cardContent.appendChild(subtitle);
   cardContent.appendChild(button);
