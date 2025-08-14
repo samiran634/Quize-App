@@ -208,7 +208,7 @@ app.get('/duel', isLoggedIn, async(req, res) => {
     res.set('token', duelToken);
      
     console.log(username);
-    res.redirect(`https://git-3wi2.onrender.com/?token=${duelToken}&name=${username}`);
+    res.redirect(`http://localhost:3000/?token=${duelToken}&name=${username}`);
   } catch (error) {
     console.error('Error creating duel token:', error);
     res.status(500).send('Error accessing duel mode');

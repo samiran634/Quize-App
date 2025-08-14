@@ -3,8 +3,9 @@ body, html {
   margin: 0;
   padding: 0;
   height: 100%;
+  width:100%;
  
-  background-image:linear-gradient(to right,black ,rgb(47, 125, 47));
+  background-image:radial-gradient(125% 125% at 50% 90%, #ffffff 40%, #14b8a6 100%);
 }
  
 @keyframes backgroundChange {
@@ -70,7 +71,8 @@ h1 {
   max-width: 70em;
   margin: 0 auto;
   padding: 2rem;
-  background-image: linear-gradient(to right, #1a1a1a,rgb(35, 144, 75));
+  background-image:   radial-gradient(circle at center, #0c491f, transparent);
+
   border-radius: 2em;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
