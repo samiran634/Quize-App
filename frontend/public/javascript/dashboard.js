@@ -1,10 +1,10 @@
-let parent = document.getElementById('parent');
+let performanceChart = null;
 
 async function getProfile() {
   try {
     const response = await fetch('/profile', {
       method: 'GET',
-      credentials: 'include',  // This line already includes cookies
+      credentials: 'include',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -16,158 +16,128 @@ async function getProfile() {
     }
     
     const data = await response.json();
-    return data;  // Return the user data for further use
+    return data;
   } catch (err) {
     console.error('Error fetching user data:', err);
-    return null;  // Handle error and return null or empty data
+    return null;
   }
 }
 
-async function showProfileData() {
+async function loadDashboard() {
   const data = await getProfile();
-  console.log(data);
+  
   if (!data) {
     console.error('No profile data available.');
+    document.getElementById('statsGrid').innerHTML = '<p class="error-message">Failed to load profile data. Please refresh the page.</p>';
     return;
-  } else {
-    const body = document.body;
-
-    // Create container
-    const container = document.createElement('div');
-    container.className = 'container';
-
-    // Create sidebar
-    const sidebar = createSidebar();
-
-    // Create main content and await its completion
-    const mainContent = await createMainContent(data);  // Await here as it's async
-
-    // Append sidebar and main content to container
-    container.appendChild(sidebar);
-    container.appendChild(mainContent);
-
-    // Append container to body
-    parent.appendChild(container);
   }
 
-  function createSidebar() {
-    const sidebar = document.createElement('div');
-    sidebar.className = 'sidebar';
+  // Update stats grid
+  const statsGrid = document.getElementById('statsGrid');
+  statsGrid.innerHTML = `
+    <div class="stat-card rank-card">
+      <div class="stat-icon">🏅</div>
+      <div class="stat-content">
+        <h3>Your Rank</h3>
+        <p class="stat-value">#${data.rank || 'N/A'}</p>
+      </div>
+    </div>
+    
+    <div class="stat-card score-card">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-content">
+        <h3>Total Score</h3>
+        <p class="stat-value">${data.score || 0}</p>
+      </div>
+    </div>
+    
+    <div class="stat-card name-card">
+      <div class="stat-icon">👤</div>
+      <div class="stat-content">
+        <h3>Player Name</h3>
+        <p class="stat-value">${data.name || 'Unknown'}</p>
+      </div>
+    </div>
+    
+    <div class="stat-card email-card">
+      <div class="stat-icon">📧</div>
+      <div class="stat-content">
+        <h3>Email</h3>
+        <p class="stat-value small">${data.userEmail || 'N/A'}</p>
+      </div>
+    </div>
+  `;
 
-    const title = document.createElement('h2');
-    title.textContent = 'Dashboard';
-    sidebar.appendChild(title);
+  // Update performance chart
+  updatePerformanceChart(data);
+}
 
-    const menu = document.createElement('ul');
-    const menuItems = ['Home', 'Profile', 'Settings', 'Reports', 'Logout'];
+function updatePerformanceChart(data) {
+  const ctx = document.getElementById('performanceChart');
+  
+  if (!ctx) return;
 
-    menuItems.forEach(item => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      if (item === 'Home') {
-        a.href = '/home';
-      } else if (item === 'Logout') {
-        a.href = '/logout';
-      } else if (item === 'Settings') {
-        a.href = '/settings';
-      }
-      else if(item=='Profile'){
-        a.href='/profileboard';
-      }
-      a.textContent = item;
-      li.appendChild(a);
-      menu.appendChild(li);
-    });
-
-    sidebar.appendChild(menu);
-    return sidebar;
+  // Destroy existing chart if it exists
+  if (performanceChart) {
+    performanceChart.destroy();
   }
 
-  async function createMainContent(data) {
-    const mainContent = document.createElement('div');
-    mainContent.className = 'main-content';
-
-    const header = document.createElement('header');
-    const h1 = document.createElement('h1');
-    h1.textContent = 'Welcome to the Dashboard';
-    const p = document.createElement('p');
-    p.textContent = 'Here is an overview of your activity.';
-    header.appendChild(h1);
-    header.appendChild(p);
-
-    const contentGrid = document.createElement('div');
-    contentGrid.className = 'content-grid';
-
-    const cardData = [
-      { title: 'Rank', value: data.rank },
-      { title: 'Name', value: data.name }, 
-      { title: 'User Email', value: data.userEmail },
-      { title: 'Highest Score', value: data.score },
-    ];
-
-    cardData.forEach(dataItem => {
-      const card = createCard(dataItem.title, dataItem.value);
-      contentGrid.appendChild(card);
-    });
-
-    mainContent.appendChild(header);
-    mainContent.appendChild(contentGrid);
-    return mainContent;
-  }
-
-  function createCard(title, value) {
-    const card = document.createElement('div');
-    card.className = 'card';
-
-    const h3 = document.createElement('h3');
-    h3.textContent = title;
-
-    const content = document.createElement('div');
-    content.className = 'card-content';
-
-    if (isNaN(value) || parseInt(value) < 1000) {
-      const p = document.createElement('p');
-      p.textContent = value;
-      p.style.wordWrap = 'break-word';
-      content.appendChild(p);
-    } else {
-      const canvas = document.createElement('canvas');
-      content.appendChild(canvas);
-      createDoughnutChart(canvas, title, parseInt(value));
-    }
-
-    card.appendChild(h3);
-    card.appendChild(content);
-    return card;
-  }
-
-  function createDoughnutChart(canvas, label, value) {
-    new Chart(canvas, {
-      type: 'doughnut',
-      data: {
-        labels: [label, 'Other'],
-        datasets: [{
-          data: [value, 10000 - value],
-          backgroundColor: ['#FF6384', '#36A2EB'],
-          hoverBackgroundColor: ['#FF6384', '#36A2EB']
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
+  performanceChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Your Score', 'Remaining to Top'],
+      datasets: [{
+        data: [data.score || 0, Math.max(0, 1000 - (data.score || 0))],
+        backgroundColor: [
+          'rgba(102, 126, 234, 0.8)',
+          'rgba(118, 75, 162, 0.2)'
+        ],
+        borderColor: [
+          'rgba(102, 126, 234, 1)',
+          'rgba(118, 75, 162, 0.5)'
+        ],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
         legend: {
-          display: false
+          position: 'bottom',
+          labels: {
+            color: '#333',
+            font: {
+              size: 14
+            }
+          }
         },
-        tooltips: {
+        tooltip: {
           callbacks: {
-            label: function (tooltipItem, data) {
-              return data.labels[tooltipItem.index] + ': ' + data.datasets[0].data[tooltipItem.index].toLocaleString();
+            label: function(context) {
+              return context.label + ': ' + context.parsed.toLocaleString() + ' pts';
             }
           }
         }
       }
-    });
-  }
+    }
+  });
 }
 
-showProfileData();
+// Refresh button handler
+document.getElementById('refreshBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  
+  await loadDashboard();
+  
+  setTimeout(() => {
+    btn.classList.remove('spinning');
+  }, 500);
+});
+
+// Initial load
+loadDashboard();
+
+// Auto-refresh every 30 seconds
+setInterval(loadDashboard, 30000);

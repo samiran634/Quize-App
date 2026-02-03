@@ -990,3 +990,85 @@ h1 {
 .card-button:hover {
   background-color: #45a049;
 }
+
+
+/* Popup sliding animations */
+.popupbox {
+  animation: slideInFromRight 0.4s ease-out;
+}
+
+.popupbox.slide-out {
+  animation: slideOutToLeft 0.4s ease-in forwards;
+}
+
+.popupbox.slide-in {
+  animation: slideInFromLeft 0.4s ease-out forwards;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Toggle button to reopen popup */
+.popup-toggle-btn {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 0 15px 15px 0;
+  padding: 20px 12px;
+  cursor: pointer;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-toggle-btn:hover {
+  padding-right: 18px;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.4);
+}
+
+.toggle-icon {
+  font-size: 32px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.popup-toggle-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}

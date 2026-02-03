@@ -26,14 +26,37 @@ window.addEventListener('DOMContentLoaded', () => {
   const isLoggedIn = /* Replace with actual authentication check */ true;
 
   if (isLoggedIn) {
+    const popup = document.querySelector(".popupbox");
+    const toggleBtn = document.getElementById("popupToggleBtn");
+    
     document.querySelector(".popup-buttons").addEventListener("click", (event) => {
       event.preventDefault();
       if (event.target.dataset.id === 'play-solo') {
-        document.querySelector(".popupbox").classList.add("hidden");
+        // Slide out to the left
+        popup.classList.add("slide-out");
+        
+        // After animation completes, hide popup and show toggle button
+        setTimeout(() => {
+          popup.style.display = "none";
+          toggleBtn.style.display = "flex";
+        }, 400);
+        
       } else if (event.target.dataset.id === 'play-dule') {
-        console.log('Duel button clicked');
-        location.href = '/duel';
+        location.href = `/loby`;
       }
+    });
+    
+    // Toggle button click handler
+    toggleBtn.addEventListener("click", () => {
+      popup.style.display = "flex";
+      popup.classList.remove("slide-out");
+      popup.classList.add("slide-in");
+      toggleBtn.style.display = "none";
+      
+      // Remove slide-in class after animation
+      setTimeout(() => {
+        popup.classList.remove("slide-in");
+      }, 400);
     });
   }
 

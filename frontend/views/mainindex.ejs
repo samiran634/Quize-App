@@ -30,7 +30,7 @@
   menu
   </span>
 </div>
-<div class="popupbox">
+<div class="popupbox" id="gamePopup">
   <h2 class="popup-title">Welcome to Quiz App!</h2>
   <p class="popup-subtitle">What would you like to play?</p>
   <div class="popup-buttons">
@@ -40,13 +40,16 @@
     </button>
     <button class="popup-btn" data-id="play-dule">
       <span class="btn-icon">⚔️</span>
-      Start a Duel
+      Play with others
     </button>
   </div>
 </div>
-<div class="duel-button" onclick="window.location.href='/duel'">
-  Duel Mode
-</div>
+
+<!-- Toggle button to reopen popup -->
+<button class="popup-toggle-btn" id="popupToggleBtn" style="display: none;">
+  <span class="toggle-icon">›</span>
+</button>
+
   <div class="app">
     <div class=" flex-container rule-book">
            <div class="big-container section-rule-box" style="display: flex;justify-content: center;flex-direction: column;" >

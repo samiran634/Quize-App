@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Lobby</title>
+    <link rel="stylesheet" href="/css/loby/style.css">
+</head>
+<body>
+
+<main>
+    <div class="lobby-header">
+        <div class="header-left">
+            <h1>🎮 Game Lobby</h1>
+        </div>
+        <nav class="header-nav">
+            <a href="/dashboard" class="nav-link">
+                <span class="nav-icon">📊</span>
+                Dashboard
+            </a>
+            <a href="/ranktable" class="nav-link">
+                <span class="nav-icon">🏆</span>
+                Rankings
+            </a>
+            <a href="/home" class="nav-link">
+                <span class="nav-icon">🏠</span>
+                Home
+            </a>
+        </nav>
+        <div class="header-actions">
+            <button id="joinByIdBtn" class="join-by-id-btn">Join by Game ID</button>
+            <button id="createGameBtn" class="create-game-btn">+ Create New Game</button>
+        </div>
+    </div>
+
+    <!-- Create Game Modal -->
+    <div id="createGameModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create New Game</h2>
+            <form id="createGameForm">
+                <div class="form-group">
+                    <label for="questionAmount">Number of Questions:</label>
+                    <input type="number" id="questionAmount" name="questionAmount" min="5" max="50" value="10" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="difficulty">Difficulty:</label>
+                    <select id="difficulty" name="difficulty" required>
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="maxCrowd">Max Players:</label>
+                    <div class="crowd-input-group">
+                        <input type="number" id="maxCrowd" name="maxCrowd" min="1" max="100" value="10" placeholder="Max players">
+                        <button type="button" id="unlimitedBtn" class="unlimited-btn">Unlimited</button>
+                    </div>
+                    <small id="crowdHint" style="color: #666;">Set maximum number of players or click Unlimited</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="rated" name="rated" checked>
+                        Rated Match
+                    </label>
+                </div>
+                
+                <button type="submit" class="submit-btn">Create Game</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="root"></div>
+    
+    <!-- Join by Game ID Modal -->
+    <div id="joinByIdModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeJoinByIdModal">&times;</span>
+            <h2>Join Game by ID</h2>
+            <form id="joinByIdForm">
+                <div class="form-group">
+                    <label for="gameIdInput">Enter Game ID:</label>
+                    <input type="text" id="gameIdInput" name="gameIdInput" placeholder="e.g., 1770129689122" required>
+                </div>
+                <button type="submit" class="submit-btn">Join Game</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Join Game Confirmation Modal -->
+    <div id="joinGameModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeJoinModal">&times;</span>
+            <h2>Join Game</h2>
+            <div id="joinGameDetails" class="join-details"></div>
+            <div class="modal-actions">
+                <button id="confirmJoinBtn" class="confirm-btn">Confirm & Join</button>
+                <button id="cancelJoinBtn" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</main>
+    
+    <script src="/javascript/loby/index.js"></script>
+</body>
+</html>

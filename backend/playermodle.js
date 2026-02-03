@@ -17,8 +17,9 @@ async function connectToDatabase() {
       validator: {
         $jsonSchema: {
           bsonType: "object",
-          required: ["name", "userEmail", "password", "score", "logintime", "rank"],
+          required: ["userId", "name", "userEmail", "password", "score", "logintime", "rank"],
           properties: {
+            userId: { bsonType: "string" },
             name: { bsonType: "string" },
             userEmail: { bsonType: "string" },
             password: { bsonType: "string" },

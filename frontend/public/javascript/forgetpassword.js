@@ -1,78 +1,154 @@
 let forgetpasswordContainer = document.querySelector('.forgetpassword-container');
-// Create form elements
-const form = document.createElement('form');
-form.className = 'forget-password-form';
 
-const emailLabel = document.createElement('label');
-emailLabel.textContent = 'Email:';
-const emailInput = document.createElement('input');
-emailInput.type = 'email';
-emailInput.id = 'userEmail';
-emailInput.required = true;
+// Create the form HTML
+forgetpasswordContainer.innerHTML = `
+  <div class="reset-password-card">
+    <div class="card-header">
+      <h2>🔐 Reset Password</h2>
+      <p>Enter your email and new password</p>
+    </div>
+    
+    <form class="forget-password-form" id="resetForm">
+      <div class="form-group">
+        <label for="userEmail">Email Address</label>
+        <input type="email" id="userEmail" placeholder="Enter your email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="newPassword">New Password</label>
+        <input type="password" id="newPassword" placeholder="Enter new password" required minlength="6">
+        <small class="form-hint">Password must be at least 6 characters</small>
+      </div>
+      
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
+      </div>
+      
+      <div id="errorMessage" class="error-message" style="display: none;"></div>
+      <div id="successMessage" class="success-message" style="display: none;"></div>
+      
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span class="btn-text">Reset Password</span>
+        <span class="btn-loader" style="display: none;">⏳</span>
+      </button>
+      
+      <div class="form-footer">
+        <a href="/login" class="back-link">← Back to Login</a>
+      </div>
+    </form>
+  </div>
+`;
 
-const newPasswordLabel = document.createElement('label');
-newPasswordLabel.textContent = 'New Password:';
-const newPasswordInput = document.createElement('input');
-newPasswordInput.type = 'password';
-newPasswordInput.id = 'newPassword';
-newPasswordInput.required = true;
+const form = document.getElementById('resetForm');
+const emailInput = document.getElementById('userEmail');
+const newPasswordInput = document.getElementById('newPassword');
+const confirmPasswordInput = document.getElementById('confirmPassword');
+const submitBtn = document.getElementById('submitBtn');
+const btnText = submitBtn.querySelector('.btn-text');
+const btnLoader = submitBtn.querySelector('.btn-loader');
+const errorMessage = document.getElementById('errorMessage');
+const successMessage = document.getElementById('successMessage');
 
-const confirmPasswordLabel = document.createElement('label');
-confirmPasswordLabel.textContent = 'Confirm Password:';
-const confirmPasswordInput = document.createElement('input');
-confirmPasswordInput.type = 'password';
-confirmPasswordInput.id = 'confirmPassword';
-confirmPasswordInput.required = true;
+function showError(message) {
+  errorMessage.textContent = message;
+  errorMessage.style.display = 'block';
+  successMessage.style.display = 'none';
+}
 
-const submitButton = document.createElement('button');
-submitButton.type = 'submit';
-submitButton.textContent = 'Reset Password';
+function showSuccess(message) {
+  successMessage.textContent = message;
+  successMessage.style.display = 'block';
+  errorMessage.style.display = 'none';
+}
 
-// Append elements to form
-form.appendChild(emailLabel);
-form.appendChild(emailInput);
-form.appendChild(newPasswordLabel);
-form.appendChild(newPasswordInput);
-form.appendChild(confirmPasswordLabel);
-form.appendChild(confirmPasswordInput);
-form.appendChild(submitButton);
+function hideMessages() {
+  errorMessage.style.display = 'none';
+  successMessage.style.display = 'none';
+}
 
-// Add form to forgetpassword container
-forgetpasswordContainer.appendChild(form);
+// Real-time password match validation
+confirmPasswordInput.addEventListener('input', () => {
+  if (confirmPasswordInput.value && newPasswordInput.value !== confirmPasswordInput.value) {
+    confirmPasswordInput.setCustomValidity('Passwords do not match');
+  } else {
+    confirmPasswordInput.setCustomValidity('');
+  }
+});
 
-// Add event listener for form submission
+// Form submission
 form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  hideMessages();
+  
+  const userEmail = emailInput.value.trim();
+  const newPassword = newPasswordInput.value;
+  const confirmPassword = confirmPasswordInput.value;
+  
+  // Validation
+  if (newPassword !== confirmPassword) {
+    showError('Passwords do not match!');
+    return;
+  }
+  
+  if (newPassword.length < 6) {
+    showError('Password must be at least 6 characters long!');
+    return;
+  }
+  
+  // Show loading state
+  submitBtn.disabled = true;
+  btnText.style.display = 'none';
+  btnLoader.style.display = 'inline';
+  
+  try {
+    // First check if user exists
+    const checkResponse = await fetch('/checkuser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ userEmail })
+    });
     
-    const userEmail = emailInput.value;
-    const newPassword = newPasswordInput.value;
-    const confirmPassword = confirmPasswordInput.value;
+    const checkData = await checkResponse.json();
     
-    if (newPassword !== confirmPassword) {
-        alert('Passwords do not match!');
-        return;
+    if (!checkData.exists) {
+      showError('No account found with this email address!');
+      submitBtn.disabled = false;
+      btnText.style.display = 'inline';
+      btnLoader.style.display = 'none';
+      return;
     }
     
-    try {
-        const response = await fetch('/forgetpassword', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userEmail, newPassword })
-        });
-        
-        if (response.ok) {
-            alert('Password reset successfully!');
-            emailInput.value = '';
-            newPasswordInput.value = '';
-            confirmPasswordInput.value = '';
-        } else {
-            const data = await response.json();
-            alert(`Failed to reset password: ${data.message}`);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while resetting the password.');
+    // Reset password
+    const response = await fetch('/forgetpassword', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ userEmail, newPassword })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      showSuccess('✅ Password reset successfully! Redirecting to login...');
+      form.reset();
+      
+      // Redirect to login after 2 seconds
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 2000);
+    } else {
+      showError(data.message || 'Failed to reset password. Please try again.');
     }
+  } catch (error) {
+    console.error('Error:', error);
+    showError('An error occurred. Please check your connection and try again.');
+  } finally {
+    submitBtn.disabled = false;
+    btnText.style.display = 'inline';
+    btnLoader.style.display = 'none';
+  }
 });

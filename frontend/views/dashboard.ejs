@@ -3,14 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Dashboard - Quiz App</title>
   <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
-  <div id="parent">
-     
-    </div>
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>🎮 Quiz App</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/home" class="nav-item">
+          <span class="nav-icon">🏠</span>
+          <span>Home</span>
+        </a>
+        <a href="/dashboard" class="nav-item active">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="/profileboard" class="nav-item">
+          <span class="nav-icon">👤</span>
+          <span>Profile</span>
+        </a>
+        <a href="/loby" class="nav-item">
+          <span class="nav-icon">🎯</span>
+          <span>Multiplayer</span>
+        </a>
+        <a href="/ranktable" class="nav-item">
+          <span class="nav-icon">🏆</span>
+          <span>Rankings</span>
+        </a>
+        <a href="/settings" class="nav-item">
+          <span class="nav-icon">⚙️</span>
+          <span>Settings</span>
+        </a>
+        <a href="/logout" class="nav-item logout">
+          <span class="nav-icon">🚪</span>
+          <span>Logout</span>
+        </a>
+      </nav>
+    </aside>
+    
+    <main class="main-content">
+      <header class="dashboard-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Welcome back! Here's your performance overview</p>
+        </div>
+        <button id="refreshBtn" class="refresh-btn">
+          <span class="refresh-icon">🔄</span>
+          Refresh
+        </button>
+      </header>
+      
+      <div id="statsGrid" class="stats-grid">
+        <!-- Stats will be loaded here -->
+      </div>
+      
+      <div class="charts-section">
+        <div class="chart-card">
+          <h3>Performance Overview</h3>
+          <canvas id="performanceChart"></canvas>
+        </div>
+      </div>
+    </main>
   </div>
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/javascript/dashboard.js" type="module"></script>
 </body>
