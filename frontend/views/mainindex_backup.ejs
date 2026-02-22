@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizoFun - Multiplayer Quiz Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            color: #fff;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        #scroll-spacer {
+            position: relative;
+            height: 300vh;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism Navigation */
+        .glass-nav {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 100;
+            display: flex;
+            gap: 1rem;
+            pointer-events: auto;
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-btn.primary {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+
+        .glass-btn.primary:hover {
+            background: rgba(76, 175, 80, 0.5);
+        }
+
+        /* Notification Box */
+        .notification-box {
+            position: fixed;
+            top: 6rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: rgba(255, 193, 7, 0.2);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 193, 7, 0.4);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            color: #fff;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            pointer-events: auto;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        /* Hero Content */
+        .hero-content {
+            position: fixed;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+            pointer-events: auto;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .cta-container {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .cta-btn:hover::before {
+            left: 100%;
+        }
+
+        .cta-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-btn.primary {
+            background: rgba(76, 175, 80, 0.4);
+            border: 2px solid rgba(76, 175, 80, 0.6);
+        }
+
+        .cta-btn.primary:hover {
+            background: rgba(76, 175, 80, 0.6);
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            text-align: center;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        .scroll-arrow {
+            font-size: 2rem;
+            display: block;
+        }
+
+        /* Loading Spinner */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Rules Section */
+        .rules-section {
+            position: relative;
+            z-index: 10;
+            padding: 4rem 2rem;
+            margin-top: 120vh;
+            pointer-events: auto;
+        }
+
+        .rules-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .rules-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .rules-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 4rem;
+        }
+
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .rule-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .rule-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .rule-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .rule-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .rule-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .rule-card p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .difficulty-section {
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        .difficulty-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+
+        .difficulty-cards {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 200px;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .difficulty-card.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .difficulty-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .difficulty-card.easy {
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+
+        .difficulty-card.medium {
+            border-color: rgba(255, 193, 7, 0.5);
+        }
+
+        .difficulty-card.hard {
+            border-color: rgba(244, 67, 54, 0.5);
+        }
+
+        .difficulty-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .difficulty-card h4 {
+            font-size: 1.3rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .difficulty-card p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .glass-nav {
+                top: 1rem;
+                right: 1rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .glass-btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+
+            .notification-box {
+                top: 5rem;
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .hero-content {
+                bottom: 20%;
+                width: 90%;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .cta-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .cta-btn {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+
+            .rules-title {
+                font-size: 2rem;
+            }
+
+            .rules-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .difficulty-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Three.js Canvas -->
+    <div id="canvas-container"></div>
+    <div id="scroll-spacer"></div>
+
+    <!-- Glassmorphism Navigation -->
+    <nav class="glass-nav">
+        <a href="/login" class="glass-btn">Login</a>
+        <a href="/ranktable" class="glass-btn">Rankings</a>
+    </nav>
+
+    <!-- Notification Box -->
+    <div class="notification-box">
+        Please log-in if you want to play duel. For non-logged-in users, solo mode is available.
+    </div>
+
+    <!-- Hero Content -->
+    <div class="hero-content">
+        <p class="hero-subtitle">Challenge Yourself</p>
+        <div class="cta-container">
+            <a href="/login" class="cta-btn primary">Login to Play</a>
+            <a href="/ranktable" class="cta-btn">View Rankings</a>
+        </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator">
+        <span class="scroll-arrow">↓</span>
+        <span>Scroll to explore</span>
+    </div>
+
+    <!-- Rules Section -->
+    <section class="rules-section">
+        <div class="rules-container">
+            <h2 class="rules-title">How to Play</h2>
+            <p class="rules-subtitle">Master the game with these simple rules</p>
+
+            <div class="rules-grid">
+                <div class="rule-card" data-delay="0">
+                    <div class="rule-number">1</div>
+                    <h3>Choose Your Mode</h3>
+                    <p>Select between Solo mode to challenge yourself or Duel mode to compete with other players in real-time.</p>
+                </div>
+
+                <div class="rule-card" data-delay="100">
+                    <div class="rule-number">2</div>
+                    <h3>Select Difficulty</h3>
+                    <p>Pick your challenge level: Easy for beginners, Medium for intermediate players, or Hard for quiz masters.</p>
+                </div>
+
+                <div class="rule-card" data-delay="200">
+                    <div class="rule-number">3</div>
+                    <h3>Answer Questions</h3>
+                    <p>Read each question carefully and select the correct answer. You have limited time for each question!</p>
+                </div>
+
+                <div class="rule-card" data-delay="0">
+                    <div class="rule-number">4</div>
+                    <h3>Earn Points</h3>
+                    <p>Correct answers earn you points. Faster answers get bonus points. Wrong answers don't deduct points.</p>
+                </div>
+
+                <div class="rule-card" data-delay="100">
+                    <div class="rule-number">5</div>
+                    <h3>Climb the Ranks</h3>
+                    <p>Compete with players worldwide. Check the leaderboard to see where you stand among the best.</p>
+                </div>
+
+                <div class="rule-card" data-delay="200">
+                    <div class="rule-number">6</div>
+                    <h3>Challenge Friends</h3>
+                    <p>In Duel mode, invite friends or get matched with random opponents for an exciting head-to-head battle.</p>
+                </div>
+            </div>
+
+            <div class="difficulty-section">
+                <h3 class="difficulty-title">Choose Your Challenge</h3>
+                <div class="difficulty-cards">
+                    <div class="difficulty-card easy" data-delay="0">
+                        <img src="/assects/level1.gif" alt="Easy Level">
+                        <h4>Easy</h4>
+                        <p>Perfect for beginners</p>
+                    </div>
+                    <div class="difficulty-card medium" data-delay="100">
+                        <img src="/assects/level2.gif" alt="Medium Level">
+                        <h4>Medium</h4>
+                        <p>Test your knowledge</p>
+                    </div>
+                    <div class="difficulty-card hard" data-delay="200">
+                        <img src="/assects/level3.gif" alt="Hard Level">
+                        <h4>Hard</h4>
+                        <p>For quiz masters</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+        import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a1a);
+        scene.fog = new THREE.FogExp2(0x1a1a1a, 0.02);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(-8, 6, 12);
+        camera.lookAt(-1, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.0;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        const roomEnvironment = new RoomEnvironment();
+        const envMap = pmremGenerator.fromScene(roomEnvironment).texture;
+        scene.environment = envMap;
+
+        const composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.4, 0.6, 0.88));
+
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+        scene.add(ambientLight);
+
+        const keyLight = new THREE.SpotLight(0xffd4a3, 150);
+        keyLight.position.set(-12, 15, 10);
+        keyLight.castShadow = true;
+        keyLight.shadow.mapSize.width = 2048;
+        keyLight.shadow.mapSize.height = 2048;
+        keyLight.angle = Math.PI / 4.5;
+        keyLight.penumbra = 0.6;
+        keyLight.decay = 2;
+        scene.add(keyLight);
+
+        const fillLight = new THREE.SpotLight(0xa3c4ff, 60);
+        fillLight.position.set(15, 8, 8);
+        fillLight.angle = Math.PI / 5;
+        fillLight.penumbra = 0.5;
+        fillLight.decay = 2;
+        scene.add(fillLight);
+
+        const rimLight = new THREE.PointLight(0xffffff, 50, 30);
+        rimLight.position.set(0, -5, -10);
+        scene.add(rimLight);
+
+        const wallGeometry = new THREE.BoxGeometry(40, 25, 4);
+        const wallMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0x2a2a2a,
+            metalness: 0.3,
+            roughness: 0.7,
+            clearcoat: 0.2,
+            clearcoatRoughness: 0.4
+        });
+        const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+        wall.position.z = -10;
+        wall.receiveShadow = true;
+        scene.add(wall);
+
+        const textMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0xf5f5f5,
+            metalness: 0.2,
+            roughness: 0.15,
+            clearcoat: 0.8,
+            clearcoatRoughness: 0.2,
+            envMapIntensity: 1.2,
+            reflectivity: 0.8
+        });
+
+        const textGroup = new THREE.Group();
+        scene.add(textGroup);
+
+        const outerSnakeGroup = new THREE.Group();
+        scene.add(outerSnakeGroup);
+
+        const innerSnakeGroup = new THREE.Group();
+        scene.add(innerSnakeGroup);
+
+        const scanLineGroup = new THREE.Group();
+        scene.add(scanLineGroup);
+
+        // Jelly effect variables
+        const raycaster = new THREE.Raycaster();
+        const mouseVector = new THREE.Vector2();
+        let isHoveringText = false;
+        let jellyWaves = [];
+        let mainTextMesh = null;
+
+        const fontLoader = new FontLoader();
+        fontLoader.load('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+            const mainTextGeometry = new TextGeometry('QuizoFun', {
+                font: font, size: 2.2, height: 0.6, curveSegments: 32,
+                bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.06, bevelSegments: 16
+            });
+            mainTextGeometry.center();
+            mainTextMesh = new THREE.Mesh(mainTextGeometry, textMaterial);
+            mainTextMesh.position.y = 0.8;
+            mainTextMesh.castShadow = true;
+            mainTextMesh.receiveShadow = true;
+            textGroup.add(mainTextMesh);
+            
+            // Store original positions for jelly effect
+            const positionAttribute = mainTextGeometry.attributes.position;
+            const originalPositions = new Float32Array(positionAttribute.array);
+            mainTextMesh.userData.originalPositions = originalPositions;
+            mainTextMesh.userData.geometry = mainTextGeometry;
+            
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        });
+
+        function createCross(scale = 1) {
+            const crossContainer = new THREE.Group();
+            const barThickness = 0.08 * scale;
+            const barLength = 0.4 * scale;
+            const horizontalBar = new THREE.BoxGeometry(barLength, barThickness, barThickness);
+            const verticalBar = new THREE.BoxGeometry(barThickness, barLength, barThickness);
+            const crossMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0xeeeeee, metalness: 0.4, roughness: 0.2,
+                emissive: 0xffffff, emissiveIntensity: 0.1, clearcoat: 0.6
+            });
+            const hBar = new THREE.Mesh(horizontalBar, crossMaterial);
+            const vBar = new THREE.Mesh(verticalBar, crossMaterial);
+            hBar.castShadow = true;
+            vBar.castShadow = true;
+            crossContainer.add(hBar);
+            crossContainer.add(vBar);
+            return crossContainer;
+        }
+
+        // Remove the ring creation code - rings removed
+        const scanCrosses = [], numScanCrosses = 25;
+        for (let i = 0; i < numScanCrosses; i++) {
+            const cross = createCross(0.4);
+            cross.visible = false;
+            scanLineGroup.add(cross);
+            scanCrosses.push(cross);
+        }
+
+        const mouse = { x: 0, y: 0 };
+        const targetRotation = { x: 0, y: 0 };
+        const currentRotation = { x: 0, y: 0 };
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            targetRotation.y = mouse.x * 0.12;
+            targetRotation.x = mouse.y * 0.08;
+            
+            // Update mouse vector for raycasting
+            mouseVector.x = mouse.x;
+            mouseVector.y = mouse.y;
+        });
+
+        // Click to trigger jelly effect
+        window.addEventListener('click', () => {
+            if (isHoveringText && mainTextMesh) {
+                jellyWaves.push({
+                    time: 0,
+                    duration: 2.0,
+                    amplitude: 0.5,
+                    frequency: 2.5
+                });
+            }
+        });
+
+        let scrollProgress = 0, targetScrollOuter = 0, currentScrollOuter = 0;
+        let targetScrollInner = 0, currentScrollInner = 0, scanProgress = 0;
+
+        window.addEventListener('scroll', () => {
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            scrollProgress = window.scrollY / maxScroll;
+            scanProgress = scrollProgress;
+        });
+
+        function lerp(start, end, factor) {
+            return start + (end - start) * factor;
+        }
+
+        // Jelly effect function
+        function applyJellyEffect() {
+            if (!mainTextMesh || !mainTextMesh.userData.geometry) return;
+
+            const geometry = mainTextMesh.userData.geometry;
+            const positionAttribute = geometry.attributes.position;
+            const originalPositions = mainTextMesh.userData.originalPositions;
+
+            if (!originalPositions) return;
+
+            // Reset to original positions
+            for (let i = 0; i < positionAttribute.count; i++) {
+                positionAttribute.setXYZ(
+                    i,
+                    originalPositions[i * 3],
+                    originalPositions[i * 3 + 1],
+                    originalPositions[i * 3 + 2]
+                );
+            }
+
+            // Remove completed waves
+            jellyWaves = jellyWaves.filter(wave => wave.time < wave.duration);
+
+            // Apply all active waves
+            jellyWaves.forEach(wave => {
+                const progress = wave.time / wave.duration;
+                const decay = Math.pow(1 - progress, 2);
+
+                for (let i = 0; i < positionAttribute.count; i++) {
+                    const x = originalPositions[i * 3];
+                    const y = originalPositions[i * 3 + 1];
+                    const z = originalPositions[i * 3 + 2];
+
+                    // Create wave effect
+                    const distance = Math.sqrt(x * x + y * y);
+                    const wavePhase = distance * wave.frequency - wave.time * 6;
+                    const waveOffset = Math.sin(wavePhase) * wave.amplitude * decay;
+                    
+                    // Apply deformation
+                    const angle = Math.atan2(y, x);
+                    const deformX = Math.cos(angle) * waveOffset;
+                    const deformY = Math.sin(angle) * waveOffset;
+                    const deformZ = waveOffset * 0.6;
+
+                    const currentX = positionAttribute.getX(i);
+                    const currentY = positionAttribute.getY(i);
+                    const currentZ = positionAttribute.getZ(i);
+
+                    positionAttribute.setXYZ(
+                        i,
+                        currentX + deformX,
+                        currentY + deformY,
+                        currentZ + deformZ
+                    );
+                }
+
+                wave.time += 0.016;
+            });
+
+            if (jellyWaves.length > 0) {
+                positionAttribute.needsUpdate = true;
+                geometry.computeVertexNormals();
+            }
+        }
+
+        // Check if mouse is hovering over text
+        function checkTextHover() {
+            if (!mainTextMesh) return;
+
+            raycaster.setFromCamera(mouseVector, camera);
+            const intersects = raycaster.intersectObject(mainTextMesh);
+            
+            const wasHovering = isHoveringText;
+            isHoveringText = intersects.length > 0;
+
+            if (isHoveringText) {
+                document.body.style.cursor = 'pointer';
+                if (!wasHovering) {
+                    jellyWaves.push({
+                        time: 0,
+                        duration: 1.0,
+                        amplitude: 0.15,
+                        frequency: 4
+                    });
+                }
+            } else {
+                document.body.style.cursor = 'default';
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            // Rings removed - no rotation needed
+
+            currentRotation.x = lerp(currentRotation.x, targetRotation.x, 0.05);
+            currentRotation.y = lerp(currentRotation.y, targetRotation.y, 0.05);
+            textGroup.rotation.y = currentRotation.y * 0.3;
+            textGroup.rotation.x = currentRotation.x * 0.3;
+
+            // Apply jelly effect
+            applyJellyEffect();
+            checkTextHover();
+
+            // Scanning line removed
+
+            keyLight.intensity = 150 + Math.sin(time * 1.2) * 10;
+            composer.render();
+        }
+
+        animate();
+
+        // Scroll animation for rules cards
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const delay = entry.target.dataset.delay || 0;
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, delay);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.rule-card, .difficulty-card').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>

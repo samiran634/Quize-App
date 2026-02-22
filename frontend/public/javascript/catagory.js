@@ -14,9 +14,10 @@ let arrayOfCategories = [
     block.style.cssText = `
       display: flex; 
       flex-wrap: wrap; 
-      gap: 10px;
-      justify-content: space-between;
-      color:black;
+      gap: 15px;
+      justify-content: center;
+      color: white;
+      padding: 1rem;
     `;
   
     for (let ele of arrayOfCategories) {
@@ -28,17 +29,22 @@ let arrayOfCategories = [
         display: flex; 
         flex-direction: row; 
         align-items: center;
-        width: 30%; /* Ensures 3 items per row */
-        height:3em;
-        padding: .5em;
-        margin:.5em;
-        background-color: black;
-        border-radius: 8px;
-        transition: transform 0.3s ease, background-color 0.3s ease;
-        color:green;
+        justify-content: center;
+        width: calc(33.333% - 10px);
+        min-width: 200px;
+        height: 3.5em;
+        padding: 1em;
+        margin: 0;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        color: #fff;
         cursor: pointer;
-        font-weight: bold;
-        font-size: 0.9rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       `;
       button.setAttribute("data-id", `${indexTracking}`);
       button.setAttribute("data-name", ele);
@@ -46,14 +52,18 @@ let arrayOfCategories = [
       button.setAttribute("class","catagory-btn");
       button.innerText = ele;
 
-      // Add hover effect for a "cool" style
+      // Add hover effect for glassmorphism style
       button.onmouseover = () => {
-        button.style.transform = "scale(1.05)";
-        button.style.backgroundColor = "#e0e0e0";
+        button.style.transform = "translateY(-3px)";
+        button.style.background = "rgba(255, 255, 255, 0.2)";
+        button.style.borderColor = "rgba(255, 255, 255, 0.4)";
+        button.style.boxShadow = "0 6px 20px rgba(0, 0, 0, 0.15)";
       };
       button.onmouseout = () => {
-        button.style.transform = "scale(1)";
-        button.style.backgroundColor = "black";
+        button.style.transform = "translateY(0)";
+        button.style.background = "rgba(255, 255, 255, 0.1)";
+        button.style.borderColor = "rgba(255, 255, 255, 0.2)";
+        button.style.boxShadow = "0 4px 15px rgba(0, 0, 0, 0.1)";
       };
 
       // Append the button to the block

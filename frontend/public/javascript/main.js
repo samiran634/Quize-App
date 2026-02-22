@@ -22,16 +22,16 @@ let mainContainer, bgContainer, box, playBtn, quizContainer, resultContainer,dif
 let index, num,catagotystring;
 let menuBtnopen,level="easy" ;
 window.addEventListener('DOMContentLoaded', () => {
-  // Check if user is logged in
-  const isLoggedIn = /* Replace with actual authentication check */ true;
+  // Check if user is logged in by checking for popup element
+  const popup = document.querySelector(".popupbox");
+  const isLoggedIn = popup !== null;
 
   if (isLoggedIn) {
-    const popup = document.querySelector(".popupbox");
     const toggleBtn = document.getElementById("popupToggleBtn");
     
     document.querySelector(".popup-buttons").addEventListener("click", (event) => {
       event.preventDefault();
-      if (event.target.dataset.id === 'play-solo') {
+      if (event.target.dataset.id === 'play-solo' || event.target.closest('[data-id="play-solo"]')) {
         // Slide out to the left
         popup.classList.add("slide-out");
         
@@ -41,23 +41,28 @@ window.addEventListener('DOMContentLoaded', () => {
           toggleBtn.style.display = "flex";
         }, 400);
         
-      } else if (event.target.dataset.id === 'play-dule') {
+        // Scroll to content section
+        document.querySelector('.content-section').scrollIntoView({ behavior: 'smooth' });
+        
+      } else if (event.target.dataset.id === 'play-dule' || event.target.closest('[data-id="play-dule"]')) {
         location.href = `/loby`;
       }
     });
     
     // Toggle button click handler
-    toggleBtn.addEventListener("click", () => {
-      popup.style.display = "flex";
-      popup.classList.remove("slide-out");
-      popup.classList.add("slide-in");
-      toggleBtn.style.display = "none";
-      
-      // Remove slide-in class after animation
-      setTimeout(() => {
-        popup.classList.remove("slide-in");
-      }, 400);
-    });
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", () => {
+        popup.style.display = "flex";
+        popup.classList.remove("slide-out");
+        popup.classList.add("slide-in");
+        toggleBtn.style.display = "none";
+        
+        // Remove slide-in class after animation
+        setTimeout(() => {
+          popup.classList.remove("slide-in");
+        }, 400);
+      });
+    }
   }
 
   initDOMElements();

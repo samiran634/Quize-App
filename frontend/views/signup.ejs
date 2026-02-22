@@ -3,36 +3,280 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Signup Form</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>Sign Up - QuizoFun</title>
+  <link rel="stylesheet" href="/css/glassmorphism.css">
+  <style>
+    .signup-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .signup-navbar {
+      position: fixed;
+      top: 2rem;
+      left: 2rem;
+      z-index: 100;
+    }
+
+    .navbar-brand {
+      font-size: 2rem;
+      font-weight: 700;
+      text-decoration: none;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-brand:hover {
+      transform: scale(1.05);
+    }
+
+    .signup-container {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      padding: 3rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 450px;
+      width: 100%;
+      animation: slideUp 0.6s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .signup-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .signup-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .signup-subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .signup-input {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 1rem 1.5rem;
+      border-radius: 15px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      width: 100%;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .signup-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .signup-input:focus {
+      border-color: rgba(102, 126, 234, 0.5);
+      box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .signup-btn {
+      width: 100%;
+      padding: 1.2rem;
+      border: none;
+      border-radius: 15px;
+      background: var(--success-gradient);
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1.5rem;
+      box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+    }
+
+    .signup-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(76, 175, 80, 0.4);
+    }
+
+    .signup-btn:active {
+      transform: translateY(0);
+    }
+
+    .divider {
+      text-align: center;
+      margin: 2rem 0;
+      color: var(--text-muted);
+      position: relative;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .divider::before {
+      left: 0;
+    }
+
+    .divider::after {
+      right: 0;
+    }
+
+    .login-link {
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .login-link a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: all 0.3s ease;
+    }
+
+    .login-link a:hover {
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .signup-container {
+        padding: 2rem;
+      }
+
+      .signup-title {
+        font-size: 2rem;
+      }
+
+      .signup-navbar {
+        top: 1rem;
+        left: 1rem;
+      }
+
+      .navbar-brand {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <nav class="signup-navbar">
+    <a href="/" class="navbar-brand">QuizoFun</a>
+  </nav>
 
-  <div class="box-container">
-    <!-- Updated form with action and method attributes -->
-    <form action="/create" method="POST">
-      <div class="form-container">
-        <!-- Name attributes are added to input fields -->
-        <input name="name" id="nameInput" class="input" type="text" placeholder="Full Name" required />
-        <input name="userEmail" id="emailInput" class="input" type="email" placeholder="Email" required />
-        <input name="passward" id="passwordInput" class="input" type="password" placeholder="Password" required />
-        <input name="conformpassward" id="confirmPasswordInput" class="input" type="password" placeholder="Confirm Password" required />
+  <div class="signup-page">
+    <div class="signup-container">
+      <div class="signup-header">
+        <h1 class="signup-title">Join QuizoFun</h1>
+        <p class="signup-subtitle">Create your account and start playing</p>
       </div>
 
-      <div class="margin-vertical"></div>
+      <form action="/create" method="POST">
+        <div class="form-group">
+          <label class="form-label" for="nameInput">Full Name</label>
+          <input 
+            name="name" 
+            id="nameInput" 
+            class="signup-input" 
+            type="text" 
+            placeholder="Enter your full name" 
+            required 
+          />
+        </div>
 
-      <button type="submit" id="signupButton" class="login-btn submit-button">Signup</button>
+        <div class="form-group">
+          <label class="form-label" for="emailInput">Email Address</label>
+          <input 
+            name="userEmail" 
+            id="emailInput" 
+            class="signup-input" 
+            type="email" 
+            placeholder="Enter your email" 
+            required 
+          />
+        </div>
 
-      <div class="margin-vertical"></div>
+        <div class="form-group">
+          <label class="form-label" for="passwordInput">Password</label>
+          <input 
+            name="passward" 
+            id="passwordInput" 
+            class="signup-input" 
+            type="password" 
+            placeholder="Create a password" 
+            required 
+          />
+        </div>
 
-      <span class="muted-link">
-        Already have an account?
-        <a href="/login" class="bold-link">Sign In</a>
-      </span>
-    </form>
+        <div class="form-group">
+          <label class="form-label" for="confirmPasswordInput">Confirm Password</label>
+          <input 
+            name="conformpassward" 
+            id="confirmPasswordInput" 
+            class="signup-input" 
+            type="password" 
+            placeholder="Confirm your password" 
+            required 
+          />
+        </div>
+
+        <button type="submit" id="signupButton" class="signup-btn">Create Account</button>
+
+        <div class="divider">or</div>
+
+        <div class="login-link">
+          Already have an account? <a href="/login">Sign In</a>
+        </div>
+      </form>
+    </div>
   </div>
 
-  <!-- JavaScript file for additional functionality if needed -->
   <script src="/javascript/signup.js" type="module"></script>
 </body>
 </html>

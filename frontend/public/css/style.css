@@ -71,21 +71,26 @@ h1 {
   max-width: 70em;
   margin: 0 auto;
   padding: 2rem;
-  background-image:   radial-gradient(circle at center, #0c491f, transparent);
-
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 2em;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 .deficulty-container{
   display: flex;
   gap:2em;
   padding:1rem;
-  margin-left:1em ;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
 }
 .flex-container:hover {
+  background: rgba(255, 255, 255, 0.15);
   transform: scale(1.02);
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
 }
 
 .flex-container * {
@@ -354,9 +359,12 @@ h1 {
 }
 
 .quiz {
-  background-color: #94a3b8;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   margin-top: 7em;
-  color: #150202;
+  color: #ffffff;
   padding: 2rem;
   width: 45vw;
   position: absolute;
@@ -364,8 +372,9 @@ h1 {
   left: 50%;
   transform: translate(-50%, -50%);
   cursor: pointer;
-  box-shadow: 0 0 10px 5px rgba(0, 0, 255, 0.3);
-  transition: box-shadow 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border-radius: 20px;
 }
 #menu-open-btn {
   position: fixed;
@@ -381,18 +390,18 @@ h1 {
     display: flex;
   }
   #menu-open-btn{
-    display: block;
+    display: flex;
   }
   .result{
     margin-top: 4em;
   }
 
   .navbar {
-    display: none;
+    display: block;
   }
 
   .navbar.hide {
-    display: flex;
+    display: none;
   }
 }
 .navbar-title-mini{
@@ -404,7 +413,9 @@ h1 {
   color: #290ec3;
 }
 .quiz:hover {
-  box-shadow: 0 0 15px 8px rgba(255, 251, 0, 0.372);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -50%) translateY(-5px);
 }
 @media (max-width: 768px) {
   .quiz {
@@ -467,12 +478,22 @@ h1 {
 }
 
 .options-contianer .button {
-  background-color: #475569;
-  color: #fafafa;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
   border-radius: 2rem;
   font-size: 1.25rem;
   font-weight: bold;
   padding: 10px 0;
+  transition: all 0.3s ease;
+}
+
+.options-contianer .button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .justify-center {
@@ -598,10 +619,12 @@ h1 {
 }
 
 #modal {
-  background-color: rgba(0, 0, 0, 0.8);
-  border: 2px solid #4CAF50;
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   color: #fff;
   padding: 30px;
   max-width: 400px;
@@ -716,13 +739,19 @@ h1 {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   max-width: 400px;
   width: 90%;
-  margin: 2rem auto;
   text-align: center;
   backdrop-filter: blur(10px);
   border: 2px solid #4CAF50;
-  animation: fadeIn 0.5s ease-out;
+  animation: slideInFromRight 0.4s ease-out;
   z-index: 9999;
   position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes fadeIn {
@@ -937,58 +966,81 @@ h1 {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  text-align: left;
+  text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   width: 100%;
-  max-width: 400px;
-  margin: 1rem 0;
+  max-width: 300px;
+  min-height: 400px;
+  padding: 1.5rem;
 }
 
 .card-container:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .card-image {
-  width: 30%;
+  width: 100%;
+  max-width: 200px;
   height: auto;
-  border-radius: 10px 0 0 10px;
+  border-radius: 10px;
+  margin-bottom: 1rem;
 }
 
 .card-content {
   padding: 1rem;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .card-title {
-  margin: 0;
-  font-size: 1.2rem;
-  color: #333;
+  margin: 0 0 1rem 0;
+  font-size: 1.8rem;
+  color: #fff;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .card-subtitle {
-  margin: 0.5rem 0;
-  font-size: 0.9rem;
-  color: #666;
+  margin: 0 0 1.5rem 0;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
 }
 
 .card-button {
-  background-color: #4CAF50;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  width: 100%;
 }
 
 .card-button:hover {
-  background-color: #45a049;
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.card-button:active {
+  transform: translateY(0);
 }
 
 
@@ -1007,33 +1059,33 @@ h1 {
 
 @keyframes slideInFromRight {
   from {
-    transform: translateX(100%);
+    transform: translate(100%, -50%);
     opacity: 0;
   }
   to {
-    transform: translateX(0);
+    transform: translate(-50%, -50%);
     opacity: 1;
   }
 }
 
 @keyframes slideOutToLeft {
   from {
-    transform: translateX(0);
+    transform: translate(-50%, -50%);
     opacity: 1;
   }
   to {
-    transform: translateX(-100%);
+    transform: translate(-200%, -50%);
     opacity: 0;
   }
 }
 
 @keyframes slideInFromLeft {
   from {
-    transform: translateX(-100%);
+    transform: translate(-200%, -50%);
     opacity: 0;
   }
   to {
-    transform: translateX(0);
+    transform: translate(-50%, -50%);
     opacity: 1;
   }
 }

@@ -102,14 +102,16 @@ function updatePerformanceChart(data) {
     options: {
       responsive: true,
       maintainAspectRatio: true,
+      aspectRatio: 2,
       plugins: {
         legend: {
           position: 'bottom',
           labels: {
-            color: '#333',
+            color: 'rgba(255, 255, 255, 0.9)',
             font: {
-              size: 14
-            }
+              size: 12
+            },
+            padding: 10
           }
         },
         tooltip: {

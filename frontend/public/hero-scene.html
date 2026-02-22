@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizoFun - Cinematic Hero Scene</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+        #scroll-spacer {
+            position: relative;
+            height: 300vh;
+            z-index: 2;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div id="scroll-spacer"></div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+        import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a1a);
+        scene.fog = new THREE.FogExp2(0x1a1a1a, 0.02);
+
+        // Camera setup - angled perspective like the Blender reference
+        const camera = new THREE.PerspectiveCamera(
+            45,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+        );
+        camera.position.set(-8, 6, 12);
+        camera.lookAt(-1, 0, 0);
+
+        // Renderer setup
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            powerPreference: "high-performance"
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.0;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Environment map for realistic reflections
+        const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        const roomEnvironment = new RoomEnvironment();
+        const envMap = pmremGenerator.fromScene(roomEnvironment).texture;
+        scene.environment = envMap;
+
+        // Post-processing setup
+        const composer = new EffectComposer(renderer);
+        const renderPass = new RenderPass(scene, camera);
+        composer.addPass(renderPass);
+
+        const bloomPass = new UnrealBloomPass(
+            new THREE.Vector2(window.innerWidth, window.innerHeight),
+            0.4,  // strength
+            0.6,  // radius
+            0.88  // threshold
+        );
+        composer.addPass(bloomPass);
+
+        // Dramatic studio lighting
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+        scene.add(ambientLight);
+
+        // Key light - warm from top left
+        const keyLight = new THREE.SpotLight(0xffd4a3, 150);
+        keyLight.position.set(-12, 15, 10);
+        keyLight.castShadow = true;
+        keyLight.shadow.mapSize.width = 2048;
+        keyLight.shadow.mapSize.height = 2048;
+        keyLight.shadow.camera.near = 1;
+        keyLight.shadow.camera.far = 40;
+        keyLight.angle = Math.PI / 4.5;
+        keyLight.penumbra = 0.6;
+        keyLight.decay = 2;
+        scene.add(keyLight);
+
+        // Fill light from right
+        const fillLight = new THREE.SpotLight(0xa3c4ff, 60);
+        fillLight.position.set(15, 8, 8);
+        fillLight.angle = Math.PI / 5;
+        fillLight.penumbra = 0.5;
+        fillLight.decay = 2;
+        scene.add(fillLight);
+
+        // Rim light for depth
+        const rimLight = new THREE.PointLight(0xffffff, 50, 30);
+        rimLight.position.set(0, -5, -10);
+        scene.add(rimLight);
+
+        // Background Wall - large gray cube
+        const wallGeometry = new THREE.BoxGeometry(40, 25, 4);
+        const wallMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0x2a2a2a,
+            metalness: 0.3,
+            roughness: 0.7,
+            clearcoat: 0.2,
+            clearcoatRoughness: 0.4
+        });
+        const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+        wall.position.z = -10;
+        wall.receiveShadow = true;
+        scene.add(wall);
+
+        // White metallic material for text (like the VOID reference)
+        const textMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0xf5f5f5,
+            metalness: 0.2,
+            roughness: 0.15,
+            clearcoat: 0.8,
+            clearcoatRoughness: 0.2,
+            envMapIntensity: 1.2,
+            reflectivity: 0.8
+        });
+
+        // Container for text (for parallax effect)
+        const textGroup = new THREE.Group();
+        scene.add(textGroup);
+
+        // Container for outer snake ring
+        const outerSnakeGroup = new THREE.Group();
+        scene.add(outerSnakeGroup);
+
+        // Container for inner snake ring
+        const innerSnakeGroup = new THREE.Group();
+        scene.add(innerSnakeGroup);
+
+        // Container for scanning line
+        const scanLineGroup = new THREE.Group();
+        scene.add(scanLineGroup);
+
+        // Load font and create text
+        const fontLoader = new FontLoader();
+        fontLoader.load(
+            'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/fonts/helvetiker_bold.typeface.json',
+            function (font) {
+                // Main Text - "QuizoFun"
+                const mainTextGeometry = new TextGeometry('QuizoFun', {
+                    font: font,
+                    size: 2.2,
+                    height: 0.6,
+                    curveSegments: 16,
+                    bevelEnabled: true,
+                    bevelThickness: 0.1,
+                    bevelSize: 0.06,
+                    bevelSegments: 8
+                });
+                mainTextGeometry.center();
+                
+                const mainText = new THREE.Mesh(mainTextGeometry, textMaterial);
+                mainText.position.y = 0.8;
+                mainText.castShadow = true;
+                mainText.receiveShadow = true;
+                textGroup.add(mainText);
+
+                // Subtext - "Reddit Daily Games"
+                const subTextGeometry = new TextGeometry('Reddit Daily Games', {
+                    font: font,
+                    size: 0.6,
+                    height: 0.25,
+                    curveSegments: 12,
+                    bevelEnabled: true,
+                    bevelThickness: 0.04,
+                    bevelSize: 0.03,
+                    bevelSegments: 5
+                });
+                subTextGeometry.center();
+                
+                const subText = new THREE.Mesh(subTextGeometry, textMaterial.clone());
+                subText.position.y = -1.3;
+                subText.castShadow = true;
+                textGroup.add(subText);
+            }
+        );
+
+        // Create cross shape (like in the reference image)
+        function createCross(scale = 1) {
+            const crossContainer = new THREE.Group();
+            
+            const barThickness = 0.08 * scale;
+            const barLength = 0.4 * scale;
+            
+            const horizontalBar = new THREE.BoxGeometry(barLength, barThickness, barThickness);
+            const verticalBar = new THREE.BoxGeometry(barThickness, barLength, barThickness);
+            
+            const crossMaterial = new THREE.MeshPhysicalMaterial({
+                color: 0xeeeeee,
+                metalness: 0.4,
+                roughness: 0.2,
+                emissive: 0xffffff,
+                emissiveIntensity: 0.1,
+                clearcoat: 0.6
+            });
+            
+            const hBar = new THREE.Mesh(horizontalBar, crossMaterial);
+            const vBar = new THREE.Mesh(verticalBar, crossMaterial);
+            
+            hBar.castShadow = true;
+            vBar.castShadow = true;
+            
+            crossContainer.add(hBar);
+            crossContainer.add(vBar);
+            
+            return crossContainer;
+        }
+
+        // Outer snake ring (fits inside Q/O inner circles)
+        const outerNumCrosses = 50;
+        const outerRadius = 1.2;
+        
+        for (let i = 0; i < outerNumCrosses; i++) {
+            const angle = (i / outerNumCrosses) * Math.PI * 2;
+            const cross = createCross(0.5);
+            
+            cross.position.x = Math.cos(angle) * outerRadius;
+            cross.position.y = Math.sin(angle) * outerRadius + 0.8;
+            cross.position.z = 0.8;
+            cross.rotation.z = angle;
+            
+            outerSnakeGroup.add(cross);
+        }
+
+        // Inner snake ring (smaller, tighter inside the O)
+        const innerNumCrosses = 40;
+        const innerRadius = 0.85;
+        
+        for (let i = 0; i < innerNumCrosses; i++) {
+            const angle = (i / innerNumCrosses) * Math.PI * 2;
+            const cross = createCross(0.35);
+            
+            cross.position.x = Math.cos(angle) * innerRadius;
+            cross.position.y = Math.sin(angle) * innerRadius + 0.8;
+            cross.position.z = 1.2;
+            cross.rotation.z = angle;
+            
+            innerSnakeGroup.add(cross);
+        }
+
+        // Create scanning line made of consecutive crosses
+        const scanCrosses = [];
+        const numScanCrosses = 25;
+        
+        for (let i = 0; i < numScanCrosses; i++) {
+            const cross = createCross(0.4);
+            cross.visible = false; // Initially hidden
+            scanLineGroup.add(cross);
+            scanCrosses.push(cross);
+        }
+
+        // Mouse parallax variables
+        const mouse = { x: 0, y: 0 };
+        const targetRotation = { x: 0, y: 0 };
+        const currentRotation = { x: 0, y: 0 };
+
+        // Mouse move event for parallax
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            targetRotation.y = mouse.x * 0.12;
+            targetRotation.x = mouse.y * 0.08;
+        });
+
+        // Scroll-triggered animation variables
+        let scrollProgress = 0;
+        let targetScrollOuter = 0;
+        let currentScrollOuter = 0;
+        let targetScrollInner = 0;
+        let currentScrollInner = 0;
+        let scanProgress = 0;
+
+        window.addEventListener('scroll', () => {
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            scrollProgress = window.scrollY / maxScroll;
+            targetScrollOuter = scrollProgress * Math.PI * 3;
+            targetScrollInner = scrollProgress * Math.PI * -4; // Counter-rotation
+            scanProgress = scrollProgress;
+        });
+
+        // Lerp function for smooth interpolation
+        function lerp(start, end, factor) {
+            return start + (end - start) * factor;
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animation Loop
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            // Smooth scroll-based rotation with lerp
+            currentScrollOuter = lerp(currentScrollOuter, targetScrollOuter, 0.06);
+            currentScrollInner = lerp(currentScrollInner, targetScrollInner, 0.06);
+            
+            outerSnakeGroup.rotation.z = currentScrollOuter;
+            innerSnakeGroup.rotation.z = currentScrollInner;
+
+            // Smooth mouse parallax with lerp
+            currentRotation.x = lerp(currentRotation.x, targetRotation.x, 0.05);
+            currentRotation.y = lerp(currentRotation.y, targetRotation.y, 0.05);
+            
+            textGroup.rotation.y = currentRotation.y * 0.3;
+            textGroup.rotation.x = currentRotation.x * 0.3;
+
+            // Scanning line animation based on scroll
+            const scanRadius = 1.2;
+            const qCenterX = -3.2; // Approximate X position of Q's center
+            const qCenterY = 0.8;
+            
+            // Animate scan line moving through the circle
+            scanCrosses.forEach((cross, index) => {
+                const offset = index / numScanCrosses;
+                const progress = (scanProgress + offset * 0.1) % 1;
+                
+                // Show crosses only during active scan
+                if (scanProgress > 0.05 && progress < 0.8) {
+                    cross.visible = true;
+                    
+                    // Position along circular path
+                    const angle = progress * Math.PI * 2;
+                    cross.position.x = qCenterX + Math.cos(angle) * scanRadius;
+                    cross.position.y = qCenterY + Math.sin(angle) * scanRadius;
+                    cross.position.z = 1.5;
+                    cross.rotation.z = angle;
+                    
+                    // Fade effect
+                    const fadeIn = Math.min(progress * 10, 1);
+                    const fadeOut = Math.max(1 - (progress - 0.6) * 5, 0);
+                    cross.scale.setScalar(fadeIn * fadeOut);
+                } else {
+                    cross.visible = false;
+                }
+            });
+
+            // Subtle light animation
+            keyLight.intensity = 150 + Math.sin(time * 1.2) * 10;
+
+            // Render with post-processing
+            composer.render();
+        }
+
+        animate();
+    </script>
+</body>
+</html>

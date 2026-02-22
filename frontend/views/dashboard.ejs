@@ -3,41 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Quiz App</title>
+  <title>Dashboard - QuizoFun</title>
+  <link rel="stylesheet" href="/css/glassmorphism.css">
   <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
   <div class="dashboard-container">
-    <aside class="sidebar">
+    <aside class="sidebar glass-sidebar">
       <div class="sidebar-header">
-        <h2>🎮 Quiz App</h2>
+        <h2 class="gradient-text">🎮 QuizoFun</h2>
       </div>
       <nav class="sidebar-nav">
-        <a href="/home" class="nav-item">
+        <a href="/home" class="nav-item glass-card">
           <span class="nav-icon">🏠</span>
           <span>Home</span>
         </a>
-        <a href="/dashboard" class="nav-item active">
+        <a href="/dashboard" class="nav-item glass-card active">
           <span class="nav-icon">📊</span>
           <span>Dashboard</span>
         </a>
-        <a href="/profileboard" class="nav-item">
+        <a href="/profileboard" class="nav-item glass-card">
           <span class="nav-icon">👤</span>
           <span>Profile</span>
         </a>
-        <a href="/loby" class="nav-item">
+        <a href="/loby" class="nav-item glass-card">
           <span class="nav-icon">🎯</span>
           <span>Multiplayer</span>
         </a>
-        <a href="/ranktable" class="nav-item">
+        <a href="/ranktable" class="nav-item glass-card">
           <span class="nav-icon">🏆</span>
           <span>Rankings</span>
         </a>
-        <a href="/settings" class="nav-item">
+        <a href="/settings" class="nav-item glass-card">
           <span class="nav-icon">⚙️</span>
           <span>Settings</span>
         </a>
-        <a href="/logout" class="nav-item logout">
+        <a href="/logout" class="nav-item glass-card logout">
           <span class="nav-icon">🚪</span>
           <span>Logout</span>
         </a>
@@ -45,12 +46,12 @@
     </aside>
     
     <main class="main-content">
-      <header class="dashboard-header">
+      <header class="dashboard-header glass-container">
         <div>
-          <h1>Dashboard</h1>
-          <p>Welcome back! Here's your performance overview</p>
+          <h1 class="gradient-text">Dashboard</h1>
+          <p class="text-secondary">Welcome back! Here's your performance overview</p>
         </div>
-        <button id="refreshBtn" class="refresh-btn">
+        <button id="refreshBtn" class="glass-btn primary">
           <span class="refresh-icon">🔄</span>
           Refresh
         </button>
@@ -61,8 +62,8 @@
       </div>
       
       <div class="charts-section">
-        <div class="chart-card">
-          <h3>Performance Overview</h3>
+        <div class="chart-card glass-container">
+          <h3 class="gradient-text">Performance Overview</h3>
           <canvas id="performanceChart"></canvas>
         </div>
       </div>

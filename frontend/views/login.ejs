@@ -3,59 +3,276 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Form</title>
-  <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-  <nav class="navbar">
-    <a href="/" class="navbar-brand">Quiz App</a>
-  </nav>
-
+  <title>Login - QuizoFun</title>
+  <link rel="stylesheet" href="/css/glassmorphism.css">
   <style>
-    .navbar {
-      background-color: transparent;
-      padding: 1em;
-      text-align: left;
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .login-navbar {
+      position: fixed;
+      top: 2rem;
+      left: 2rem;
+      z-index: 100;
     }
 
     .navbar-brand {
-      color: rgb(81, 48, 232);
-      font-size: 3.5em;
+      font-size: 2rem;
+      font-weight: 700;
       text-decoration: none;
-      font-weight: bold;
-      margin-left: 1em;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: all 0.3s ease;
     }
 
     .navbar-brand:hover {
-      color: #ddd;
+      transform: scale(1.05);
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      padding: 3rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 450px;
+      width: 100%;
+      animation: slideUp 0.6s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .login-input {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 1rem 1.5rem;
+      border-radius: 15px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      width: 100%;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .login-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .login-input:focus {
+      border-color: rgba(102, 126, 234, 0.5);
+      box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .forgot-password {
+      text-align: right;
+      margin-top: 0.5rem;
+    }
+
+    .forgot-password a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+    }
+
+    .forgot-password a:hover {
+      color: var(--text-primary);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 1.2rem;
+      border: none;
+      border-radius: 15px;
+      background: var(--primary-gradient);
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1.5rem;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .divider {
+      text-align: center;
+      margin: 2rem 0;
+      color: var(--text-muted);
+      position: relative;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .divider::before {
+      left: 0;
+    }
+
+    .divider::after {
+      right: 0;
+    }
+
+    .signup-link {
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .signup-link a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: all 0.3s ease;
+    }
+
+    .signup-link a:hover {
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .login-container {
+        padding: 2rem;
+      }
+
+      .login-title {
+        font-size: 2rem;
+      }
+
+      .login-navbar {
+        top: 1rem;
+        left: 1rem;
+      }
+
+      .navbar-brand {
+        font-size: 1.5rem;
+      }
     }
   </style>
+</head>
+<body>
+  <nav class="login-navbar">
+    <a href="/" class="navbar-brand">QuizoFun</a>
+  </nav>
 
+  <div class="login-page">
+    <div class="login-container">
+      <div class="login-header">
+        <h1 class="login-title">Welcome Back</h1>
+        <p class="login-subtitle">Login to continue your quiz journey</p>
+      </div>
 
-  <div class="box-container">
-    <div class="form-container">
-      <!-- The form element with action and method attributes -->
       <form action="/login" method="post">
-        <input name="userEmail" class="input" type="text" placeholder="Email" required />
-        <input name="passward" class="input" type="password" placeholder="Password" required style="padding-right: 5em;" />
-        
-        <a href="/resetpassword" class="muted-link">Forgot Password?</a>
+        <div class="form-group">
+          <label class="form-label" for="userEmail">Email Address</label>
+          <input 
+            name="userEmail" 
+            id="userEmail"
+            class="login-input" 
+            type="email" 
+            placeholder="Enter your email" 
+            required 
+          />
+        </div>
 
-        <div class="margin-vertical"></div>
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input 
+            name="passward" 
+            id="password"
+            class="login-input" 
+            type="password" 
+            placeholder="Enter your password" 
+            required 
+          />
+        </div>
 
-        <button type="submit" class="login-btn submit-button">Login</button>
+        <div class="forgot-password">
+          <a href="/resetpassword">Forgot Password?</a>
+        </div>
 
-        <div class="margin-vertical"></div>
+        <button type="submit" class="login-btn">Login</button>
 
-        <span class="muted-link">
-          Don't have an Account?
-          <a href="/signup" class="bold-link">Sign Up</a>
-        </span>
+        <div class="divider">or</div>
+
+        <div class="signup-link">
+          Don't have an account? <a href="/signup">Sign Up</a>
+        </div>
       </form>
     </div>
   </div>
 
-  <!-- JavaScript file to handle additional login functionalities (if needed) -->
   <script src="/javascript/login.js" type="module"></script>
 </body>
 </html>

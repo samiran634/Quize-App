@@ -4,94 +4,726 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz App</title>
+    <title>QuizoFun - Multiplayer Quiz Game</title>
+    <link rel="stylesheet" href="/css/glassmorphism.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=menu" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section - Full Screen */
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #canvas-container canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2rem;
+        }
+
+        .hero-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 100;
+        }
+
+        .hero-nav-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-nav .glass-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .hero-nav .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Menu Button - Hidden on desktop, shown on mobile */
+        #menu-open-btn {
+            display: none;
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            width: 50px;
+            height: 50px;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+            border: none;
+            outline: none;
+        }
+
+        #menu-open-btn span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        #menu-open-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        #menu-open-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        #menu-open-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        #menu-open-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        #menu-open-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Mobile Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100vh;
+            background: rgba(26, 26, 46, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            padding: 5rem 2rem 2rem;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+        }
+
+        .navbar.show {
+            right: 0 !important;
+        }
+
+        .navbar-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .navbar-links a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+
+        /* Mobile Overlay */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .hero-cta {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero-title {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .cta-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .cta-btn.primary {
+            background: rgba(76, 175, 80, 0.4);
+            border: 2px solid rgba(76, 175, 80, 0.6);
+        }
+
+        .cta-btn.secondary {
+            background: rgba(255, 107, 107, 0.4);
+            border: 2px solid rgba(255, 107, 107, 0.6);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        /* Content Section */
+        .content-section {
+            position: relative;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            padding: 4rem 2rem;
+            z-index: 100;
+        }
+
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 3rem;
+        }
+
+        /* Hide original elements initially */
+        .overlay { display: none; }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 1rem; }
+            .cta-btn { padding: 1rem 2rem; font-size: 1rem; }
+            .section-title { font-size: 2rem; }
+            
+            /* Hide desktop nav, show mobile menu button */
+            .hero-nav {
+                display: none !important;
+            }
+            
+            #menu-open-btn {
+                display: flex !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title { font-size: 0.9rem; }
+            .cta-btn { padding: 0.8rem 1.5rem; font-size: 0.9rem; }
+            
+            #menu-open-btn {
+                top: 1rem;
+                right: 1rem;
+                width: 45px;
+                height: 45px;
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="overlay"> 
-    <div class="spinner">
-<img src="https://jwt.io/img/pic_logo.svg" alt="Spinner Image" class="spinner-image">
-  </div>
-</div>
- 
-<nav class="navbar d-flex justify-space-between">
-
-  <h1 class="navbar-title" ><a href="/home">Quiz App</a></h1>
-  <div class="navbar-links">
-      <a href="/logout" id="login-link" class="nav-link">Logout</a>
-      <a href="/dashboard" id="dashboard-link" class="nav-link">Dashboard</a>
-      <a href="/ranktable" id="ranktable-link" class="nav-link">Rank Table</a>
-  </div>
-</nav>
-<div class="navbar-mini-container hide">
-  <p class="navbar-title-mini">Quiz App</p>
-<span class="material-symbols-outlined hide" id="menu-open-btn">
-  menu
-  </span>
-</div>
-<div class="popupbox" id="gamePopup">
-  <h2 class="popup-title">Welcome to Quiz App!</h2>
-  <p class="popup-subtitle">What would you like to play?</p>
-  <div class="popup-buttons">
-    <button class="popup-btn" data-id="play-solo">
-      <span class="btn-icon">🎮</span>
-      Play Solo
-    </button>
-    <button class="popup-btn" data-id="play-dule">
-      <span class="btn-icon">⚔️</span>
-      Play with others
-    </button>
-  </div>
-</div>
-
-<!-- Toggle button to reopen popup -->
-<button class="popup-toggle-btn" id="popupToggleBtn" style="display: none;">
-  <span class="toggle-icon">›</span>
-</button>
-
-  <div class="app">
-    <div class=" flex-container rule-book">
-           <div class="big-container section-rule-box" style="display: flex;justify-content: center;flex-direction: column;" >
-          <div class="rules">
+    <!-- Loading Overlay -->
+    <div class="overlay">
+        <div class="spinner">
+            <div class="spinner-image" style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
         </div>
-      </div>
+    </div>
 
-</div>
- 
-  <div class="deficulty-container"></div>
- 
+    <!-- Hero Section with Three.js -->
+    <section class="hero-section">
+        <div id="canvas-container"></div>
+        
+        <div class="hero-overlay">
+            <nav class="hero-nav">
+                <div></div>
+                <div class="hero-nav-links">
+                    <a href="/dashboard" class="glass-btn">Dashboard</a>
+                    <a href="/ranktable" class="glass-btn">Rankings</a>
+                    <a href="/logout" class="glass-btn">Logout</a>
+                </div>
+            </nav>
 
-<div   class="d-flex " style="justify-content: center;">
-  <div id="modal" class="hide d-flex" style ="justify-content: center;position: absolute; justify-self: center; flex-direction: column;border: greenyellow solid .2em ;border-radius: 1rem;"><h2 class="rule-title d-flex" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">enter no of questions you want to solve</h2>
-  <input type="number" placeholder="enter numbers" class="d-flex inputbox" style="border-radius:1rem ;height:4em;justify-content: center;justify-items: center cl"><span class="d-flex" style="justify-content: center;"><button class="circular-btn cursor" style="align-self: center; font-size: larger;font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" data-name="submit-btn">submit</button></span>
-  </div>
-  </div>
-  <div class="quiz hide d-flex direction-column gap">
+            <div class="hero-cta">
+                <h2 class="hero-title">Choose Your Game Mode</h2>
+                <div class="cta-buttons">
+                    <button class="cta-btn primary" data-id="play-solo">
+                        🎮 Play Solo
+                    </button>
+                    <a href="/loby" class="cta-btn secondary">
+                        ⚔️ Multiplayer Duel
+                    </a>
+                </div>
+            </div>
+
+            <div class="scroll-indicator">
+                <div style="font-size: 2rem;">↓</div>
+                <div>Scroll to see rules</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Section - Rules & Game -->
+    <section class="content-section">
+        <div class="content-container">
+            <h2 class="section-title">How to Play</h2>
+            <p class="section-subtitle">Follow these simple rules to master the game</p>
+
+            <!-- Original Quiz Content -->
+            <div class="app">
+                <div class="flex-container rule-book">
+                    <div class="big-container section-rule-box" style="display: flex;justify-content: center;flex-direction: column;">
+                        <div class="rules"></div>
+                    </div>
+                </div>
+            </div>
          
-  </div>
+            <div class="flex-container">
+                <div class="deficulty-container"></div>
+            </div>
 
-  <div class="result hide">
+            <div class="d-flex" style="justify-content: center;">
+                <div id="modal" class="hide d-flex" style="justify-content: center;position: absolute; justify-self: center; flex-direction: column;border: greenyellow solid .2em ;border-radius: 1rem;">
+                    <h2 class="rule-title d-flex" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">enter no of questions you want to solve</h2>
+                    <input type="number" placeholder="enter numbers" class="d-flex inputbox" style="border-radius:1rem ;height:4em;justify-content: center;justify-items: center">
+                    <span class="d-flex" style="justify-content: center;">
+                        <button class="circular-btn cursor" style="align-self: center; font-size: larger;font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" data-name="submit-btn">submit</button>
+                    </span>
+                </div>
+            </div>
 
-  </div>
-  <div class="gen-btn d-flex" style="justify-content: center;">
+            <div class="quiz hide d-flex direction-column gap"></div>
+            <div class="result hide"></div>
 
+            <div class="gen-btn d-flex" style="justify-content: center;">
+                <button class="play-btn cursor hide" style="justify-self: center;">
+                    Let the game begin
+                    <span role="img" aria-label="fire">🔥🔥</span>
+                </button>
+            </div>
+        </div>
+    </section>
 
-<button class="play-btn cursor hide" style="justify-self: center;">
-    Let the game begin
-    <span role="img" aria-label="fire">
-      🔥🔥
-    </span>
-</button>
-</div>
+    <!-- Popup for logged-in users (initially visible) -->
+    <div class="popupbox">
+        <h2 class="popup-title">Welcome Back! 🎮</h2>
+        <p class="popup-subtitle">Choose your game mode</p>
+        <div class="popup-buttons">
+            <button class="popup-btn" data-id="play-solo">
+                <span class="btn-icon">🎯</span>
+                Play Solo
+            </button>
+            <button class="popup-btn" data-id="play-dule">
+                <span class="btn-icon">⚔️</span>
+                Multiplayer Duel
+            </button>
+        </div>
+    </div>
 
- 
- 
+    <!-- Toggle button to reopen popup (initially hidden) -->
+    <button id="popupToggleBtn" class="popup-toggle-btn" style="display: none;">
+        <span class="toggle-icon">◀</span>
+    </button>
+
+    <!-- Mobile menu button -->
+    <button id="menu-open-btn" aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <!-- Hidden navbar for mobile -->
+    <nav class="navbar" id="mobile-navbar">
+        <div class="navbar-links">
+            <a href="/dashboard" id="dashboard-link">📊 Dashboard</a>
+            <a href="/ranktable" id="ranktable-link">🏆 Rankings</a>
+            <a href="/logout" id="login-link">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <!-- Three.js Script -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+        import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a1a);
+        scene.fog = new THREE.FogExp2(0x1a1a1a, 0.02);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        
+        // Adjust camera position based on screen size
+        if (window.innerWidth <= 768) {
+            camera.position.set(-6, 5, 10);
+        } else {
+            camera.position.set(-8, 6, 12);
+        }
+        camera.lookAt(-1, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.0;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        const roomEnvironment = new RoomEnvironment();
+        const envMap = pmremGenerator.fromScene(roomEnvironment).texture;
+        scene.environment = envMap;
+
+        const composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.4, 0.6, 0.88));
+
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+        scene.add(ambientLight);
+
+        const keyLight = new THREE.SpotLight(0xffd4a3, 150);
+        keyLight.position.set(-12, 15, 10);
+        keyLight.castShadow = true;
+        keyLight.shadow.mapSize.width = 2048;
+        keyLight.shadow.mapSize.height = 2048;
+        keyLight.angle = Math.PI / 4.5;
+        keyLight.penumbra = 0.6;
+        keyLight.decay = 2;
+        scene.add(keyLight);
+
+        const fillLight = new THREE.SpotLight(0xa3c4ff, 60);
+        fillLight.position.set(15, 8, 8);
+        fillLight.angle = Math.PI / 5;
+        fillLight.penumbra = 0.5;
+        fillLight.decay = 2;
+        scene.add(fillLight);
+
+        const wallGeometry = new THREE.BoxGeometry(40, 25, 4);
+        const wallMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0x2a2a2a, metalness: 0.3, roughness: 0.7,
+            clearcoat: 0.2, clearcoatRoughness: 0.4
+        });
+        const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+        wall.position.z = -10;
+        wall.receiveShadow = true;
+        scene.add(wall);
+
+        const textMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0xf5f5f5, metalness: 0.2, roughness: 0.15,
+            clearcoat: 0.8, clearcoatRoughness: 0.2,
+            envMapIntensity: 1.2, reflectivity: 0.8
+        });
+
+        const textGroup = new THREE.Group();
+        scene.add(textGroup);
+
+        const raycaster = new THREE.Raycaster();
+        const mouseVector = new THREE.Vector2();
+        let isHoveringText = false;
+        let jellyWaves = [];
+        let mainTextMesh = null;
+
+        const fontLoader = new FontLoader();
+        fontLoader.load('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+            // Adjust text size based on screen width
+            const isMobile = window.innerWidth <= 768;
+            const textSize = isMobile ? 1.5 : 2.2;
+            const textHeight = isMobile ? 0.4 : 0.6;
+            
+            const mainTextGeometry = new TextGeometry('QuizoFun', {
+                font: font, size: textSize, height: textHeight, curveSegments: 32,
+                bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.06, bevelSegments: 16
+            });
+            mainTextGeometry.center();
+            mainTextMesh = new THREE.Mesh(mainTextGeometry, textMaterial);
+            mainTextMesh.position.y = 0.8;
+            mainTextMesh.castShadow = true;
+            mainTextMesh.receiveShadow = true;
+            textGroup.add(mainTextMesh);
+            
+            const positionAttribute = mainTextGeometry.attributes.position;
+            const originalPositions = new Float32Array(positionAttribute.array);
+            mainTextMesh.userData.originalPositions = originalPositions;
+            mainTextMesh.userData.geometry = mainTextGeometry;
+        });
+
+        const mouse = { x: 0, y: 0 };
+        const targetRotation = { x: 0, y: 0 };
+        const currentRotation = { x: 0, y: 0 };
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            targetRotation.y = mouse.x * 0.12;
+            targetRotation.x = mouse.y * 0.08;
+            mouseVector.x = mouse.x;
+            mouseVector.y = mouse.y;
+        });
+
+        window.addEventListener('click', () => {
+            if (isHoveringText && mainTextMesh) {
+                jellyWaves.push({ time: 0, duration: 0.8, amplitude: 0.3, frequency: 2 });
+            }
+        });
+
+        function lerp(start, end, factor) {
+            return start + (end - start) * factor;
+        }
+
+        function applyJellyEffect() {
+            if (!mainTextMesh || !mainTextMesh.userData.geometry) return;
+            const geometry = mainTextMesh.userData.geometry;
+            const positionAttribute = geometry.attributes.position;
+            const originalPositions = mainTextMesh.userData.originalPositions;
+            if (!originalPositions) return;
+
+            for (let i = 0; i < positionAttribute.count; i++) {
+                positionAttribute.setXYZ(i, originalPositions[i * 3], originalPositions[i * 3 + 1], originalPositions[i * 3 + 2]);
+            }
+
+            jellyWaves = jellyWaves.filter(wave => wave.time < wave.duration);
+            jellyWaves.forEach(wave => {
+                const progress = wave.time / wave.duration;
+                const decay = Math.pow(1 - progress, 3);
+                for (let i = 0; i < positionAttribute.count; i++) {
+                    const x = originalPositions[i * 3];
+                    const y = originalPositions[i * 3 + 1];
+                    const z = originalPositions[i * 3 + 2];
+                    const charRegion = Math.floor(x / 0.5);
+                    const wavePhase = charRegion * wave.frequency - wave.time * 8;
+                    const torque = Math.sin(wavePhase) * wave.amplitude * decay;
+                    const rotatedY = y * Math.cos(torque) - z * Math.sin(torque);
+                    const rotatedZ = y * Math.sin(torque) + z * Math.cos(torque);
+                    const currentX = positionAttribute.getX(i);
+                    const currentY = positionAttribute.getY(i);
+                    const currentZ = positionAttribute.getZ(i);
+                    positionAttribute.setXYZ(i, currentX, currentY + (rotatedY - y) * 0.3, currentZ + (rotatedZ - z) * 0.3);
+                }
+                wave.time += 0.025;
+            });
+
+            if (jellyWaves.length > 0) {
+                positionAttribute.needsUpdate = true;
+                geometry.computeVertexNormals();
+            }
+        }
+
+        function checkTextHover() {
+            if (!mainTextMesh) return;
+            raycaster.setFromCamera(mouseVector, camera);
+            const intersects = raycaster.intersectObject(mainTextMesh);
+            const wasHovering = isHoveringText;
+            isHoveringText = intersects.length > 0;
+            if (isHoveringText) {
+                document.body.style.cursor = 'pointer';
+                if (!wasHovering) {
+                    jellyWaves.push({ time: 0, duration: 0.6, amplitude: 0.08, frequency: 3 });
+                }
+            } else {
+                document.body.style.cursor = 'default';
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            
+            // Adjust camera position on resize
+            if (window.innerWidth <= 768) {
+                camera.position.set(-6, 5, 10);
+            } else {
+                camera.position.set(-8, 6, 12);
+            }
+            camera.lookAt(-1, 0, 0);
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+            currentRotation.x = lerp(currentRotation.x, targetRotation.x, 0.05);
+            currentRotation.y = lerp(currentRotation.y, targetRotation.y, 0.05);
+            textGroup.rotation.y = currentRotation.y * 0.3;
+            textGroup.rotation.x = currentRotation.x * 0.3;
+            applyJellyEffect();
+            checkTextHover();
+            keyLight.intensity = 150 + Math.sin(time * 1.2) * 10;
+            composer.render();
+        }
+        animate();
+
+        // Handle Solo button click
+        document.querySelector('[data-id="play-solo"]').addEventListener('click', () => {
+            document.querySelector('.content-section').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Mobile Menu Toggle
+        const menuBtn = document.getElementById('menu-open-btn');
+        const mobileNavbar = document.getElementById('mobile-navbar');
+        const mobileOverlay = document.getElementById('mobile-overlay');
+
+        function toggleMobileMenu() {
+            console.log('Toggle menu clicked'); // Debug
+            menuBtn.classList.toggle('active');
+            mobileNavbar.classList.toggle('show');
+            mobileOverlay.classList.toggle('show');
+            console.log('Navbar classes:', mobileNavbar.className); // Debug
+        }
+
+        if (menuBtn) {
+            menuBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleMobileMenu();
+            });
+        }
+        
+        if (mobileOverlay) {
+            mobileOverlay.addEventListener('click', toggleMobileMenu);
+        }
+
+        // Close menu when clicking a link
+        document.querySelectorAll('.navbar-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (mobileNavbar && mobileNavbar.classList.contains('show')) {
+                    toggleMobileMenu();
+                }
+            });
+        });
+    </script>
+
+    <!-- Original Quiz Logic -->
     <script src="/javascript/main.js" type="module"></script>
- 
 </body>
 </html>
-
-<style>
-
-</style>
