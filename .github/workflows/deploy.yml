@@ -22,4 +22,4 @@ jobs:
           npm install --force
           touch .env
           cp ../.env .env 
-          pm2 reload backend/app.js 
+          pm2 reload backend/app.js --update-env
