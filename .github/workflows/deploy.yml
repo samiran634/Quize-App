@@ -17,7 +17,6 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         
         script: |
-          sudo su
           cd Quize-App
           git pull origin main
           npm install --force
