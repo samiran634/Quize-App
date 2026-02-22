@@ -19,6 +19,7 @@ jobs:
         script: |
           sudo su
           git pull origin main
+          cd Quize-App
           npm install --force
           cp ../.env .env 
-          pm2 reload Quize-App/backend/app.js 
+          pm2 reload backend/app.js 
