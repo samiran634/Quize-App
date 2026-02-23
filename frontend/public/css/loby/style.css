@@ -48,6 +48,23 @@ body::before {
   background-clip: text;
 }
 
+@media (max-width: 768px) {
+  .lobby-header h1 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lobby-header h1 {
+    font-size: 18px;
+  }
+  
+  .lobby-header h1::after {
+    content: "";
+    display: block;
+  }
+}
+
 .header-actions {
   display: flex;
   gap: 10px;
@@ -919,7 +936,55 @@ body::before {
   }
 }
 
+/* Keyboard Navigation Focus Styles */
+button:focus,
+input:focus,
+select:focus,
+a:focus {
+  outline: 3px solid rgba(102, 126, 234, 0.8);
+  outline-offset: 2px;
+}
+
+.close:focus {
+  outline: 3px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+}
+
+/* Skip to content link for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: rgba(102, 126, 234, 0.9);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .lobby-header {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .header-nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 @media (max-width: 768px) {
   .options {
     grid-template-columns: 1fr;
@@ -932,6 +997,164 @@ body::before {
   .lobby-header {
     flex-direction: column;
     gap: 15px;
+    padding: 15px;
+  }
+  
+  .lobby-header h1 {
+    font-size: 20px;
+  }
+  
+  .header-nav {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .nav-link {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .join-by-id-btn,
+  .create-game-btn {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+  
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+    margin: 5% auto;
+  }
+  
+  .modal-content h2 {
+    font-size: 1.3rem;
+  }
+  
+  .form-group label {
+    font-size: 14px;
+  }
+  
+  .form-group input[type="number"],
+  .form-group input[type="text"],
+  .form-group select {
+    font-size: 16px;
+    padding: 12px;
+  }
+  
+  .crowd-input-group {
+    flex-direction: column;
+  }
+  
+  .unlimited-btn {
+    width: 100%;
+  }
+  
+  #root {
+    padding: 15px;
+    gap: 15px;
+    justify-content: center;
+  }
+  
+  .game-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+  }
+  
+  .game-card h3 {
+    font-size: 1.3rem;
+  }
+  
+  .game-card p,
+  .stats-row {
+    font-size: 15px;
+  }
+  
+  .game-card button {
+    padding: 12px;
+    font-size: 15px;
+  }
+  
+  .start-game-btn {
+    font-size: 16px;
+    padding: 14px;
+  }
+  
+  .question-text {
+    font-size: 18px;
+  }
+  
+  .option-btn {
+    padding: 16px;
+    font-size: 15px;
+  }
+  
+  .timer {
+    font-size: 20px;
+  }
+  
+  .notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    font-size: 14px;
+    padding: 12px 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .lobby-header h1 {
+    font-size: 18px;
+  }
+  
+  .nav-link {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .join-by-id-btn,
+  .create-game-btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+  
+  .modal-content {
+    padding: 15px;
+  }
+  
+  .modal-content h2 {
+    font-size: 1.1rem;
+  }
+  
+  .game-card {
+    padding: 15px;
+  }
+  
+  .game-card h3 {
+    font-size: 1.1rem;
+  }
+  
+  .game-id-row {
+    font-size: 11px;
+  }
+  
+  .question-text {
+    font-size: 16px;
+  }
+  
+  .option-btn {
+    padding: 14px;
+    font-size: 14px;
   }
 }
 .navbar-links{

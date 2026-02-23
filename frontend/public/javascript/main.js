@@ -292,11 +292,207 @@ function createDeficultyInputContainer(){
          Image:"/assects/level3.gif"
       }
      ];
-     items.map((item)=> {
-       createCard(diffcontainer,item.text,item.subtitle,item.Image);
+     
+     // Create navigation wrapper
+     const navWrapper = document.createElement('div');
+     navWrapper.className = 'difficulty-nav';
+     
+     // Create container for cards
+     const cardsContainer = document.createElement('div');
+     cardsContainer.className = 'deficulty-container';
+     cardsContainer.id = 'difficulty-cards-container';
+     
+     items.forEach((item)=> {
+       createCard(cardsContainer, item.text, item.subtitle, item.Image);
      });
      
+     // Create left arrow
+     const leftArrow = document.createElement('button');
+     leftArrow.className = 'difficulty-arrow left';
+     leftArrow.innerHTML = '&#8249;';
+     leftArrow.setAttribute('aria-label', 'Previous difficulty level');
+     leftArrow.onclick = () => scrollDifficulty('left');
+     
+     // Create right arrow
+     const rightArrow = document.createElement('button');
+     rightArrow.className = 'difficulty-arrow right';
+     rightArrow.innerHTML = '&#8250;';
+     rightArrow.setAttribute('aria-label', 'Next difficulty level');
+     rightArrow.onclick = () => scrollDifficulty('right');
+     
+     // Create dots indicator
+     const dotsContainer = document.createElement('div');
+     dotsContainer.className = 'difficulty-dots';
+     dotsContainer.id = 'difficulty-dots';
+     
+     items.forEach((item, idx) => {
+       const dot = document.createElement('button');
+       dot.className = `difficulty-dot ${idx === 0 ? 'active' : ''}`;
+       dot.setAttribute('aria-label', `Go to ${item.text} difficulty`);
+       dot.onclick = () => scrollToCard(idx);
+       dotsContainer.appendChild(dot);
+     });
+     
+     navWrapper.appendChild(leftArrow);
+     navWrapper.appendChild(cardsContainer);
+     navWrapper.appendChild(rightArrow);
+     
+     diffcontainer.appendChild(navWrapper);
+     diffcontainer.appendChild(dotsContainer);
+     
+     // Initialize carousel
+     initDifficultyCarousel();
   }
+}
+
+let currentDifficultyIndex = 0;
+const totalDifficulties = 3;
+
+function scrollDifficulty(direction) {
+  const container = document.getElementById('difficulty-cards-container');
+  if (!container) return;
+  
+  const cards = container.querySelectorAll('.card-container');
+  if (cards.length === 0) return;
+  
+  if (direction === 'left') {
+    currentDifficultyIndex = Math.max(0, currentDifficultyIndex - 1);
+  } else {
+    currentDifficultyIndex = Math.min(cards.length - 1, currentDifficultyIndex + 1);
+  }
+  
+  scrollToCard(currentDifficultyIndex);
+}
+
+function scrollToCard(index) {
+  const container = document.getElementById('difficulty-cards-container');
+  if (!container) return;
+  
+  const cards = container.querySelectorAll('.card-container');
+  if (cards.length === 0 || index >= cards.length) return;
+  
+  currentDifficultyIndex = index;
+  
+  // Scroll to the card
+  cards[index].scrollIntoView({
+    behavior: 'smooth',
+    block: 'nearest',
+    inline: 'center'
+  });
+  
+  // Update dots
+  updateDots();
+  
+  // Update arrow states
+  updateArrows();
+}
+
+function updateDots() {
+  const dots = document.querySelectorAll('.difficulty-dot');
+  dots.forEach((dot, idx) => {
+    if (idx === currentDifficultyIndex) {
+      dot.classList.add('active');
+    } else {
+      dot.classList.remove('active');
+    }
+  });
+}
+
+function updateArrows() {
+  const leftArrow = document.querySelector('.difficulty-arrow.left');
+  const rightArrow = document.querySelector('.difficulty-arrow.right');
+  
+  if (leftArrow) {
+    if (currentDifficultyIndex === 0) {
+      leftArrow.classList.add('disabled');
+    } else {
+      leftArrow.classList.remove('disabled');
+    }
+  }
+  
+  if (rightArrow) {
+    if (currentDifficultyIndex === totalDifficulties - 1) {
+      rightArrow.classList.add('disabled');
+    } else {
+      rightArrow.classList.remove('disabled');
+    }
+  }
+}
+
+function initDifficultyCarousel() {
+  const container = document.getElementById('difficulty-cards-container');
+  if (!container) return;
+  
+  // Add scroll event listener to update dots on manual scroll
+  let scrollTimeout;
+  container.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const cards = container.querySelectorAll('.card-container');
+      const containerRect = container.getBoundingClientRect();
+      const containerCenter = containerRect.left + containerRect.width / 2;
+      
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+      
+      cards.forEach((card, idx) => {
+        const cardRect = card.getBoundingClientRect();
+        const cardCenter = cardRect.left + cardRect.width / 2;
+        const distance = Math.abs(containerCenter - cardCenter);
+        
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = idx;
+        }
+      });
+      
+      if (closestIndex !== currentDifficultyIndex) {
+        currentDifficultyIndex = closestIndex;
+        updateDots();
+        updateArrows();
+      }
+    }, 100);
+  });
+  
+  // Add keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (diffcontainer && !diffcontainer.classList.contains('hide')) {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        scrollDifficulty('left');
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        scrollDifficulty('right');
+      }
+    }
+  });
+  
+  // Add touch swipe support
+  let touchStartX = 0;
+  let touchEndX = 0;
+  
+  container.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+  
+  container.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  });
+  
+  function handleSwipe() {
+    const swipeThreshold = 50;
+    if (touchStartX - touchEndX > swipeThreshold) {
+      // Swipe left
+      scrollDifficulty('right');
+    } else if (touchEndX - touchStartX > swipeThreshold) {
+      // Swipe right
+      scrollDifficulty('left');
+    }
+  }
+  
+  // Initialize arrow states
+  updateArrows();
 }
 
 function handleDifficultyClick(event){

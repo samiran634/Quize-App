@@ -26,6 +26,62 @@ const confirmJoinBtn = document.getElementById('confirmJoinBtn');
 const cancelJoinBtn = document.getElementById('cancelJoinBtn');
 const joinGameDetails = document.getElementById('joinGameDetails');
 
+// Track last focused element before modal opens
+let lastFocusedElement = null;
+
+// Trap focus within modal
+function trapFocus(modal) {
+    const focusableElements = modal.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstFocusable = focusableElements[0];
+    const lastFocusable = focusableElements[focusableElements.length - 1];
+
+    modal.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            if (e.shiftKey) {
+                if (document.activeElement === firstFocusable) {
+                    lastFocusable.focus();
+                    e.preventDefault();
+                }
+            } else {
+                if (document.activeElement === lastFocusable) {
+                    firstFocusable.focus();
+                    e.preventDefault();
+                }
+            }
+        }
+        
+        // Close modal on Escape key
+        if (e.key === 'Escape') {
+            closeModalAndRestoreFocus(modal);
+        }
+    });
+}
+
+function closeModalAndRestoreFocus(modalElement) {
+    modalElement.style.display = 'none';
+    if (lastFocusedElement) {
+        lastFocusedElement.focus();
+        lastFocusedElement = null;
+    }
+}
+
+function openModal(modalElement) {
+    lastFocusedElement = document.activeElement;
+    modalElement.style.display = 'block';
+    
+    // Focus first focusable element
+    const focusableElements = modalElement.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusableElements.length > 0) {
+        focusableElements[0].focus();
+    }
+    
+    trapFocus(modalElement);
+}
+
 // Random game name generator
 const gameNameAdjectives = ['Epic', 'Legendary', 'Mighty', 'Swift', 'Brave', 'Cosmic', 'Thunder', 'Shadow', 'Golden', 'Crystal', 'Dragon', 'Phoenix', 'Storm', 'Mystic', 'Royal'];
 const gameNameNouns = ['Warriors', 'Champions', 'Masters', 'Legends', 'Heroes', 'Knights', 'Wizards', 'Titans', 'Guardians', 'Seekers', 'Raiders', 'Hunters', 'Fighters', 'Challengers', 'Conquerors'];
@@ -278,12 +334,12 @@ function displayQuestion(question, timeLimit) {
     const gameContent = document.getElementById('gameContent');
     gameContent.innerHTML = `
         <div class="question-container">
-            <div class="timer">Time: <span id="timeDisplay">${timeLimit}</span>s</div>
+            <div class="timer" role="timer" aria-live="polite" aria-atomic="true">Time: <span id="timeDisplay">${timeLimit}</span>s</div>
             <h3>Question ${question.index + 1}</h3>
-            <p class="question-text">${question.question}</p>
-            <div class="options">
+            <p class="question-text" role="heading" aria-level="4">${question.question}</p>
+            <div class="options" role="group" aria-label="Answer options">
                 ${question.options.map((opt, idx) => `
-                    <button class="option-btn" data-answer="${opt}">${opt}</button>
+                    <button class="option-btn" data-answer="${opt}" aria-label="Option ${idx + 1}: ${opt}">${opt}</button>
                 `).join('')}
             </div>
         </div>
@@ -508,25 +564,41 @@ function buildLayout(){
 
         // Create Child: Join Button
         const joinBtn = document.createElement('button');
+        joinBtn.setAttribute('aria-label', `Join ${gameName}`);
         
         if (game.locked) {
             joinBtn.innerText = "Locked 🔒";
             joinBtn.disabled = true;
             joinBtn.title = "This game is locked by the creator";
+            joinBtn.setAttribute('aria-disabled', 'true');
         } else if (game.isFull) {
             joinBtn.innerText = "Full 🚫";
             joinBtn.disabled = true;
             joinBtn.title = "This game has reached maximum capacity";
+            joinBtn.setAttribute('aria-disabled', 'true');
         } else {
             joinBtn.innerText = "Join Game";
             joinBtn.disabled = false;
             joinBtn.title = "Click to join this game";
+            joinBtn.setAttribute('aria-disabled', 'false');
         }
         
         // Add click event for the button
         joinBtn.onclick = () => {
             showJoinConfirmation(game, gameName);
         };
+        
+        // Make card keyboard accessible
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'article');
+        card.setAttribute('aria-label', `${gameName}, ${game.difficulty} difficulty, ${crowdDisplay}, ${game.questionAmount} questions`);
+        
+        // Allow Enter key to focus join button
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !game.locked && !game.isFull) {
+                joinBtn.click();
+            }
+        });
 
         // Append everything to the Card
         card.appendChild(title);
@@ -555,7 +627,7 @@ function showJoinConfirmation(game, gameName) {
         </div>
         <div class="detail-row">
             <span class="detail-label">Game ID:</span>
-            <span class="detail-value">${game.gameid} <button class="copy-id-btn-inline" onclick="copyToClipboard('${game.gameid}')">📋 Copy</button></span>
+            <span class="detail-value">${game.gameid} <button class="copy-id-btn-inline" onclick="copyToClipboard('${game.gameid}')" aria-label="Copy game ID">📋 Copy</button></span>
         </div>
         <div class="detail-row">
             <span class="detail-label">Difficulty:</span>
@@ -573,30 +645,30 @@ function showJoinConfirmation(game, gameName) {
             <span class="detail-label">Type:</span>
             <span class="detail-value">${game.rated ? '🏆 Rated Match' : '🎮 Casual Match'}</span>
         </div>
-        <p style="margin-top: 15px; color: #666; font-size: 14px;">
+        <p style="margin-top: 15px; color: rgba(255, 255, 255, 0.7); font-size: 14px;">
             You will join as your authenticated user. Ready to play?
         </p>
     `;
     
-    joinGameModal.style.display = 'block';
+    openModal(joinGameModal);
 }
 
 // Modal event listeners
 createGameBtn.onclick = function() {
-    modal.style.display = 'block';
+    openModal(modal);
 }
 
 closeModal.onclick = function() {
-    modal.style.display = 'none';
+    closeModalAndRestoreFocus(modal);
 }
 
 // Join by ID modal
 joinByIdBtn.onclick = function() {
-    joinByIdModal.style.display = 'block';
+    openModal(joinByIdModal);
 }
 
 closeJoinByIdModal.onclick = function() {
-    joinByIdModal.style.display = 'none';
+    closeModalAndRestoreFocus(joinByIdModal);
 }
 
 joinByIdForm.onsubmit = async function(e) {
@@ -608,7 +680,7 @@ joinByIdForm.onsubmit = async function(e) {
         return;
     }
     
-    joinByIdModal.style.display = 'none';
+    closeModalAndRestoreFocus(joinByIdModal);
     
     // Find the game in the list or try to join directly
     const game = games.find(g => g.gameid === gameId);
@@ -624,18 +696,18 @@ joinByIdForm.onsubmit = async function(e) {
 }
 
 closeJoinModal.onclick = function() {
-    joinGameModal.style.display = 'none';
+    closeModalAndRestoreFocus(joinGameModal);
     selectedGameForJoin = null;
 }
 
 cancelJoinBtn.onclick = function() {
-    joinGameModal.style.display = 'none';
+    closeModalAndRestoreFocus(joinGameModal);
     selectedGameForJoin = null;
 }
 
 confirmJoinBtn.onclick = function() {
     if (selectedGameForJoin) {
-        joinGameModal.style.display = 'none';
+        closeModalAndRestoreFocus(joinGameModal);
         joinGame(selectedGameForJoin.gameid);
         selectedGameForJoin = null;
     }
@@ -643,14 +715,14 @@ confirmJoinBtn.onclick = function() {
 
 window.onclick = function(event) {
     if (event.target == modal) {
-        modal.style.display = 'none';
+        closeModalAndRestoreFocus(modal);
     }
     if (event.target == joinGameModal) {
-        joinGameModal.style.display = 'none';
+        closeModalAndRestoreFocus(joinGameModal);
         selectedGameForJoin = null;
     }
     if (event.target == joinByIdModal) {
-        joinByIdModal.style.display = 'none';
+        closeModalAndRestoreFocus(joinByIdModal);
     }
 }
 
@@ -667,12 +739,14 @@ unlimitedBtn.onclick = function() {
         maxCrowdInput.disabled = true;
         unlimitedBtn.classList.add('active');
         unlimitedBtn.textContent = '✓ Unlimited';
+        unlimitedBtn.setAttribute('aria-pressed', 'true');
         crowdHint.textContent = 'Unlimited players can join this game';
     } else {
         maxCrowdInput.disabled = false;
         maxCrowdInput.value = '10';
         unlimitedBtn.classList.remove('active');
         unlimitedBtn.textContent = 'Unlimited';
+        unlimitedBtn.setAttribute('aria-pressed', 'false');
         crowdHint.textContent = 'Set maximum number of players or click Unlimited';
     }
 }
@@ -691,6 +765,19 @@ createGameForm.onsubmit = function(e) {
     
     newGameRequest(gameData);
 }
+
+// Add keyboard navigation for game cards
+document.addEventListener('keydown', function(e) {
+    // Allow Enter or Space to activate buttons
+    if (e.key === 'Enter' || e.key === ' ') {
+        if (e.target.classList.contains('option-btn') || 
+            e.target.classList.contains('game-card') ||
+            e.target.tagName === 'BUTTON') {
+            e.preventDefault();
+            e.target.click();
+        }
+    }
+});
 
 // Initial fetch
 fetchRunningGame();

@@ -74,6 +74,11 @@
             background: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
         }
+        
+        .hero-nav .glass-btn:focus {
+            outline: 3px solid #2600ff;
+            outline-offset: 2px;
+        }
 
         /* Mobile Menu Button */
         #menu-open-btn {
@@ -98,6 +103,11 @@
             gap: 5px;
             border: none;
             outline: none;
+        }
+        
+        #menu-open-btn:focus {
+            outline: 3px solid #2600ff;
+            outline-offset: 2px;
         }
 
         #menu-open-btn span {
@@ -177,6 +187,11 @@
             background: rgba(255, 255, 255, 0.2);
             transform: translateX(-5px);
         }
+        
+        .navbar-links a:focus {
+            outline: 3px solid #2600ff;
+            outline-offset: 2px;
+        }
 
         /* Mobile Overlay */
         .mobile-overlay {
@@ -235,6 +250,11 @@
         .cta-btn:hover {
             background: rgba(255, 255, 255, 0.25);
             transform: translateY(-3px);
+        }
+        
+        .cta-btn:focus {
+            outline: 3px solid #2600ff;
+            outline-offset: 3px;
         }
 
         .cta-btn.primary {
@@ -310,9 +330,35 @@
         .overlay { display: none; }
 
         @media (max-width: 768px) {
-            .hero-title { font-size: 1rem; }
-            .cta-btn { padding: 1rem 2rem; font-size: 1rem; }
-            .section-title { font-size: 2rem; }
+            .hero-title { 
+                font-size: 1rem;
+                letter-spacing: 1px;
+            }
+            
+            .cta-btn { 
+                padding: 1rem 2rem; 
+                font-size: 1rem;
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .cta-buttons {
+                gap: 1rem;
+                padding: 0 1rem;
+            }
+            
+            .section-title { 
+                font-size: 2rem;
+            }
+            
+            .section-subtitle {
+                font-size: 1rem;
+            }
+            
+            .info-banner {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+            }
             
             /* Hide desktop nav, show mobile menu button */
             .hero-nav {
@@ -322,11 +368,22 @@
             #menu-open-btn {
                 display: flex !important;
             }
+            
+            .content-section {
+                padding: 2rem 1rem;
+            }
         }
 
         @media (max-width: 480px) {
-            .hero-title { font-size: 0.9rem; }
-            .cta-btn { padding: 0.8rem 1.5rem; font-size: 0.9rem; }
+            .hero-title { 
+                font-size: 0.9rem;
+                letter-spacing: 0.5px;
+            }
+            
+            .cta-btn { 
+                padding: 0.8rem 1.5rem; 
+                font-size: 0.9rem;
+            }
             
             #menu-open-btn {
                 top: 1rem;
@@ -335,10 +392,40 @@
                 height: 45px;
                 font-size: 2rem;
             }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .section-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .scroll-indicator {
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* Skip link for keyboard navigation */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #2600ff;
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 10000;
+        }
+
+        .skip-link:focus {
+            top: 0;
         }
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <!-- Loading Overlay -->
     <div class="overlay">
         <div class="spinner">
@@ -351,7 +438,7 @@
         <div id="canvas-container"></div>
         
         <div class="hero-overlay">
-            <nav class="hero-nav">
+            <nav class="hero-nav" aria-label="Main navigation">
                 <div></div>
                 <div class="hero-nav-links">
                     <a href="/login" class="glass-btn">Login</a>
@@ -362,16 +449,16 @@
             <div class="hero-cta">
                 <h2 class="hero-title">Start Your Quiz Journey</h2>
                 <div class="cta-buttons">
-                    <button class="cta-btn primary" data-id="play-solo">
+                    <button class="cta-btn primary" data-id="play-solo" aria-label="Play solo mode as guest">
                         🎮 Play Solo (Guest)
                     </button>
-                    <a href="/login" class="cta-btn secondary">
+                    <a href="/login" class="cta-btn secondary" aria-label="Login for multiplayer mode">
                         🔐 Login for Multiplayer
                     </a>
                 </div>
             </div>
 
-            <div class="scroll-indicator">
+            <div class="scroll-indicator" aria-hidden="true">
                 <div style="font-size: 2rem;">↓</div>
                 <div>Scroll to see rules</div>
             </div>
@@ -379,9 +466,9 @@
     </section>
 
     <!-- Content Section - Rules & Game -->
-    <section class="content-section">
+    <section class="content-section" id="main-content">
         <div class="content-container">
-            <div class="info-banner">
+            <div class="info-banner" role="alert">
                 ℹ️ Please log in if you want to play duel mode. Solo mode is available for guests.
             </div>
 
@@ -424,17 +511,17 @@
     </section>
 
     <!-- Mobile menu button -->
-    <button id="menu-open-btn" aria-label="Open menu">
+    <button id="menu-open-btn" aria-label="Toggle navigation menu" aria-expanded="false">
         <span></span>
         <span></span>
         <span></span>
     </button>
 
     <!-- Mobile Overlay -->
-    <div class="mobile-overlay" id="mobile-overlay"></div>
+    <div class="mobile-overlay" id="mobile-overlay" aria-hidden="true"></div>
 
     <!-- Hidden navbar for mobile -->
-    <nav class="navbar" id="mobile-navbar">
+    <nav class="navbar" id="mobile-navbar" aria-label="Mobile navigation">
         <div class="navbar-links">
             <a href="/login" id="login-link">🔐 Login</a>
             <a href="/ranktable" id="ranktable-link">🏆 Rankings</a>
@@ -533,8 +620,13 @@
 
         const fontLoader = new FontLoader();
         fontLoader.load('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-            const mainTextGeometry = new TextGeometry('QuizoFun', {
-                font: font, size: 2.2, height: 0.6, curveSegments: 32,
+            // Check if mobile view
+            const isMobile = window.innerWidth <= 768;
+            const textContent = isMobile ? 'Quizo\nFun' : 'QuizoFun';
+            const textSize = isMobile ? 1.8 : 2.2;
+            
+            const mainTextGeometry = new TextGeometry(textContent, {
+                font: font, size: textSize, height: 0.6, curveSegments: 32,
                 bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.06, bevelSegments: 16
             });
             mainTextGeometry.center();
@@ -634,6 +726,40 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
             composer.setSize(window.innerWidth, window.innerHeight);
+            
+            // Reload text on resize if crossing mobile breakpoint
+            const isMobile = window.innerWidth <= 768;
+            if (mainTextMesh) {
+                const currentText = mainTextMesh.geometry.parameters?.text || '';
+                const shouldBeMobile = isMobile ? 'Quizo\nFun' : 'QuizoFun';
+                
+                if (currentText !== shouldBeMobile) {
+                    // Remove old text
+                    textGroup.remove(mainTextMesh);
+                    mainTextMesh.geometry.dispose();
+                    
+                    // Create new text with proper line break
+                    const fontLoader = new FontLoader();
+                    fontLoader.load('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+                        const textSize = isMobile ? 1.8 : 2.2;
+                        const mainTextGeometry = new TextGeometry(shouldBeMobile, {
+                            font: font, size: textSize, height: 0.6, curveSegments: 32,
+                            bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.06, bevelSegments: 16
+                        });
+                        mainTextGeometry.center();
+                        mainTextMesh = new THREE.Mesh(mainTextGeometry, textMaterial);
+                        mainTextMesh.position.y = 0.8;
+                        mainTextMesh.castShadow = true;
+                        mainTextMesh.receiveShadow = true;
+                        textGroup.add(mainTextMesh);
+                        
+                        const positionAttribute = mainTextGeometry.attributes.position;
+                        const originalPositions = new Float32Array(positionAttribute.array);
+                        mainTextMesh.userData.originalPositions = originalPositions;
+                        mainTextMesh.userData.geometry = mainTextGeometry;
+                    });
+                }
+            }
         });
 
         let time = 0;
@@ -662,11 +788,26 @@
         const mobileOverlay = document.getElementById('mobile-overlay');
 
         function toggleMobileMenu() {
-            console.log('Toggle menu clicked'); // Debug
+            const isOpen = menuBtn.classList.contains('active');
             menuBtn.classList.toggle('active');
             mobileNavbar.classList.toggle('show');
             mobileOverlay.classList.toggle('show');
-            console.log('Navbar classes:', mobileNavbar.className); // Debug
+            
+            // Update ARIA attributes
+            menuBtn.setAttribute('aria-expanded', !isOpen);
+            mobileOverlay.setAttribute('aria-hidden', isOpen);
+            
+            // Focus management
+            if (!isOpen) {
+                // Menu is opening - focus first link
+                const firstLink = mobileNavbar.querySelector('a');
+                if (firstLink) {
+                    setTimeout(() => firstLink.focus(), 100);
+                }
+            } else {
+                // Menu is closing - return focus to button
+                menuBtn.focus();
+            }
         }
 
         if (menuBtn) {
@@ -675,10 +816,41 @@
                 e.stopPropagation();
                 toggleMobileMenu();
             });
+            
+            // Keyboard support for menu button
+            menuBtn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                }
+            });
         }
         
         if (mobileOverlay) {
             mobileOverlay.addEventListener('click', toggleMobileMenu);
+        }
+        
+        // Trap focus within mobile menu when open
+        if (mobileNavbar) {
+            mobileNavbar.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    toggleMobileMenu();
+                }
+                
+                if (e.key === 'Tab') {
+                    const focusableElements = mobileNavbar.querySelectorAll('a, button');
+                    const firstElement = focusableElements[0];
+                    const lastElement = focusableElements[focusableElements.length - 1];
+                    
+                    if (e.shiftKey && document.activeElement === firstElement) {
+                        e.preventDefault();
+                        lastElement.focus();
+                    } else if (!e.shiftKey && document.activeElement === lastElement) {
+                        e.preventDefault();
+                        firstElement.focus();
+                    }
+                }
+            });
         }
 
         // Close menu when clicking a link

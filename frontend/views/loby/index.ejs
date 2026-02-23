@@ -8,66 +8,70 @@
     <link rel="stylesheet" href="/css/loby/style.css">
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
-<main>
+<main id="main-content">
     <div class="lobby-header">
         <div class="header-left">
             <h1>🎮 Game Lobby</h1>
         </div>
-        <nav class="header-nav">
-            <a href="/dashboard" class="nav-link">
-                <span class="nav-icon">📊</span>
+        <nav class="header-nav" aria-label="Main navigation">
+            <a href="/dashboard" class="nav-link" aria-label="Go to Dashboard">
+                <span class="nav-icon" aria-hidden="true">📊</span>
                 Dashboard
             </a>
-            <a href="/ranktable" class="nav-link">
-                <span class="nav-icon">🏆</span>
+            <a href="/ranktable" class="nav-link" aria-label="View Rankings">
+                <span class="nav-icon" aria-hidden="true">🏆</span>
                 Rankings
             </a>
-            <a href="/home" class="nav-link">
-                <span class="nav-icon">🏠</span>
+            <a href="/home" class="nav-link" aria-label="Go to Home">
+                <span class="nav-icon" aria-hidden="true">🏠</span>
                 Home
             </a>
         </nav>
         <div class="header-actions">
-            <button id="joinByIdBtn" class="join-by-id-btn">Join by Game ID</button>
-            <button id="createGameBtn" class="create-game-btn">+ Create New Game</button>
+            <button id="joinByIdBtn" class="join-by-id-btn" aria-label="Join game by entering game ID">Join by Game ID</button>
+            <button id="createGameBtn" class="create-game-btn" aria-label="Create a new game">+ Create New Game</button>
         </div>
     </div>
 
     <!-- Create Game Modal -->
-    <div id="createGameModal" class="modal">
+    <div id="createGameModal" class="modal" role="dialog" aria-labelledby="createGameTitle" aria-modal="true">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Create New Game</h2>
+            <button class="close" aria-label="Close modal">&times;</button>
+            <h2 id="createGameTitle">Create New Game</h2>
             <form id="createGameForm">
                 <div class="form-group">
                     <label for="questionAmount">Number of Questions:</label>
-                    <input type="number" id="questionAmount" name="questionAmount" min="5" max="50" value="10" required>
+                    <input type="number" id="questionAmount" name="questionAmount" min="5" max="50" value="10" required aria-describedby="questionHint">
+                    <small id="questionHint" style="color: rgba(255, 255, 255, 0.7);">Choose between 5 and 50 questions</small>
                 </div>
                 
                 <div class="form-group">
                     <label for="difficulty">Difficulty:</label>
-                    <select id="difficulty" name="difficulty" required>
+                    <select id="difficulty" name="difficulty" required aria-describedby="difficultyHint">
                         <option value="easy">Easy</option>
                         <option value="medium" selected>Medium</option>
                         <option value="hard">Hard</option>
                     </select>
+                    <small id="difficultyHint" style="color: rgba(255, 255, 255, 0.7);">Select game difficulty level</small>
                 </div>
 
                 <div class="form-group">
                     <label for="maxCrowd">Max Players:</label>
                     <div class="crowd-input-group">
-                        <input type="number" id="maxCrowd" name="maxCrowd" min="1" max="100" value="10" placeholder="Max players">
-                        <button type="button" id="unlimitedBtn" class="unlimited-btn">Unlimited</button>
+                        <input type="number" id="maxCrowd" name="maxCrowd" min="1" max="100" value="10" placeholder="Max players" aria-describedby="crowdHint">
+                        <button type="button" id="unlimitedBtn" class="unlimited-btn" aria-pressed="false">Unlimited</button>
                     </div>
-                    <small id="crowdHint" style="color: #666;">Set maximum number of players or click Unlimited</small>
+                    <small id="crowdHint" style="color: rgba(255, 255, 255, 0.7);">Set maximum number of players or click Unlimited</small>
                 </div>
                 
                 <div class="form-group">
                     <label>
-                        <input type="checkbox" id="rated" name="rated" checked>
+                        <input type="checkbox" id="rated" name="rated" checked aria-describedby="ratedHint">
                         Rated Match
                     </label>
+                    <small id="ratedHint" style="color: rgba(255, 255, 255, 0.7);">Rated matches affect your ranking</small>
                 </div>
                 
                 <button type="submit" class="submit-btn">Create Game</button>
@@ -75,17 +79,18 @@
         </div>
     </div>
     
-    <div id="root"></div>
+    <div id="root" role="main" aria-label="Available games"></div>
     
     <!-- Join by Game ID Modal -->
-    <div id="joinByIdModal" class="modal">
+    <div id="joinByIdModal" class="modal" role="dialog" aria-labelledby="joinByIdTitle" aria-modal="true">
         <div class="modal-content">
-            <span class="close" id="closeJoinByIdModal">&times;</span>
-            <h2>Join Game by ID</h2>
+            <button class="close" id="closeJoinByIdModal" aria-label="Close modal">&times;</button>
+            <h2 id="joinByIdTitle">Join Game by ID</h2>
             <form id="joinByIdForm">
                 <div class="form-group">
                     <label for="gameIdInput">Enter Game ID:</label>
-                    <input type="text" id="gameIdInput" name="gameIdInput" placeholder="e.g., 1770129689122" required>
+                    <input type="text" id="gameIdInput" name="gameIdInput" placeholder="e.g., 1770129689122" required aria-describedby="gameIdHint">
+                    <small id="gameIdHint" style="color: rgba(255, 255, 255, 0.7);">Enter the unique game ID to join</small>
                 </div>
                 <button type="submit" class="submit-btn">Join Game</button>
             </form>
@@ -93,11 +98,11 @@
     </div>
     
     <!-- Join Game Confirmation Modal -->
-    <div id="joinGameModal" class="modal">
+    <div id="joinGameModal" class="modal" role="dialog" aria-labelledby="joinGameTitle" aria-modal="true">
         <div class="modal-content">
-            <span class="close" id="closeJoinModal">&times;</span>
-            <h2>Join Game</h2>
-            <div id="joinGameDetails" class="join-details"></div>
+            <button class="close" id="closeJoinModal" aria-label="Close modal">&times;</button>
+            <h2 id="joinGameTitle">Join Game</h2>
+            <div id="joinGameDetails" class="join-details" role="region" aria-label="Game details"></div>
             <div class="modal-actions">
                 <button id="confirmJoinBtn" class="confirm-btn">Confirm & Join</button>
                 <button id="cancelJoinBtn" class="cancel-btn">Cancel</button>
