@@ -16,11 +16,11 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ noServer: true });
 const PORT = process.env.PORT;
+
 // Middleware setup
 const corsOptions = {
   origin: [
-    'https://quize-app-qan3.onrender.com',
-    'https://git-3wi2.onrender.com'
+    process.env.FRONTEND_URL ? process.env.FRONTEND_URL.trim() : ''
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
@@ -28,8 +28,8 @@ const corsOptions = {
   exposedHeaders: ['token'],
 };
 app.use(cors(corsOptions));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 app.use(cookieparser());
 
@@ -44,13 +44,13 @@ let redisClient = null;
 const gameRooms = new Map(); // gameId -> { players: Set, gameData: {}, questionIndex: 0, timer: null }
 
 // connecting the redis 
-async function makeRedisConnection(){
+async function makeRedisConnection() {
   if (redisClient && redisClient.isOpen) {
     return redisClient;
   }
 
   try {
-    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+    const redisUrl = process.env.REDIS_URL;
     redisClient = createClient({
       url: redisUrl
     });
@@ -68,95 +68,95 @@ async function makeRedisConnection(){
 }
 // Create (or Add) a Game
 async function createGame(gameId, gameData) {
-    try {
-        const client = await makeRedisConnection();
-        const key = `game:${gameId}`;
+  try {
+    const client = await makeRedisConnection();
+    const key = `game:${gameId}`;
 
-        // Flatten the object for Redis Hash storage
-        // Redis Hashes store values as strings, so we convert numbers/booleans
-        // crowd: -1 means unlimited players, positive number means max capacity
-        await client.hSet(key, {
-            questionAmount: gameData.questionAmount.toString(),
-            locked: gameData.locked.toString(),
-            maxCrowd: gameData.maxCrowd.toString(), // -1 for unlimited, positive for limit
-            currentCrowd: '0', // Current number of players
-            difficulty: gameData.difficulty,
-            rated: gameData.rated.toString()
-        });
+    // Flatten the object for Redis Hash storage
+    // Redis Hashes store values as strings, so we convert numbers/booleans
+    // crowd: -1 means unlimited players, positive number means max capacity
+    await client.hSet(key, {
+      questionAmount: gameData.questionAmount.toString(),
+      locked: gameData.locked.toString(),
+      maxCrowd: gameData.maxCrowd.toString(),
+      currentCrowd: '0', // Current number of players
+      difficulty: gameData.difficulty,
+      rated: gameData.rated.toString()
+    });
 
-        // Add this game's ID to our "directory" Set
-        await client.sAdd('active_games', key);
-        
-        console.log(`Game ${gameId} created.`);
-        return true;
-    } catch (error) {
-        console.error('Error creating game:', error);
-        throw error;
-    }
+    // Add this game's ID to our "directory" Set
+    await client.sAdd('active_games', key);
+
+    console.log(`Game ${gameId} created.`);
+    return true;
+  } catch (error) {
+    console.error('Error creating game:', error);
+    throw error;
+  }
 }
 
 // 2. HELPER: Add User to Queue (as per your comment)
 async function addUserToQueue(userId) {
-    try {
-        const client = await makeRedisConnection();
-        await client.rPush('user_queue', userId);
-        console.log(`User ${userId} added to queue.`);
-    } catch (error) {
-        console.error('Error adding user to queue:', error);
-        throw error;
-    }
+  try {
+    const client = await makeRedisConnection();
+    await client.rPush('user_queue', userId);
+    console.log(`User ${userId} added to queue.`);
+  } catch (error) {
+    console.error('Error adding user to queue:', error);
+    throw error;
+  }
 }
 
 // 3. MAIN GOAL: Fetch all Game Info objects as an Array
 async function getAllGames() {
-    try {
-        const client = await makeRedisConnection();
-        // Step A: Get all the keys (IDs) from the Set
-        const gameKeys = await client.sMembers('active_games');
+  try {
+    const client = await makeRedisConnection();
+    // Step A: Get all the keys (IDs) from the Set
+    const gameKeys = await client.sMembers('active_games');
 
-        if (gameKeys.length === 0) return [];
+    if (gameKeys.length === 0) return [];
 
-        // Step B: Use a Transaction (Multi) to fetch all Hashes in parallel
-        // This is much faster than awaiting them one by one in a loop
-        const multi = client.multi();
-        
-        for (const key of gameKeys) {
-            multi.hGetAll(key);
-        }
-        
-        const gamesData = await multi.exec();
+    // Step B: Use a Transaction (Multi) to fetch all Hashes in parallel
+    // This is much faster than awaiting them one by one in a loop
+    const multi = client.multi();
 
-        // Step C: Reformat the data back into your desired structure
-        // gamesData is an array of objects [ { questionAmount: '10', ... }, ... ]
-        
-        const formattedResult = gamesData.map((game, index) => {
-            // Optional: Parse strings back to numbers/booleans if needed
-            const maxCrowd = parseInt(game.maxCrowd);
-            const currentCrowd = parseInt(game.currentCrowd);
-            
-            return {
-                gameid: gameKeys[index].split(':')[1], // Extract ID from "game:101"
-                questionAmount: parseInt(game.questionAmount),
-                locked: game.locked === 'true',
-                maxCrowd: maxCrowd, // -1 for unlimited
-                currentCrowd: currentCrowd,
-                isFull: maxCrowd !== -1 && currentCrowd >= maxCrowd, // Check if game is full
-                difficulty: game.difficulty,
-                rated: game.rated === 'true'
-            };
-        });
-
-        return formattedResult;
-    } catch (error) {
-        console.error('Error fetching all games:', error);
-        return [];
+    for (const key of gameKeys) {
+      multi.hGetAll(key);
     }
+
+    const gamesData = await multi.exec();
+
+    // Step C: Reformat the data back into your desired structure
+    // gamesData is an array of objects [ { questionAmount: '10', ... }, ... ]
+
+    const formattedResult = gamesData.map((game, index) => {
+      // Optional: Parse strings back to numbers/booleans if needed
+      const maxCrowd = parseInt(game.maxCrowd);
+      const currentCrowd = parseInt(game.currentCrowd);
+
+      return {
+        gameid: gameKeys[index].split(':')[1], // Extract ID from "game:101"
+        questionAmount: parseInt(game.questionAmount),
+        locked: game.locked === 'true',
+        maxCrowd: maxCrowd, // -1 for unlimited
+        currentCrowd: currentCrowd,
+        isFull: maxCrowd !== -1 && currentCrowd >= maxCrowd, // Check if game is full
+        difficulty: game.difficulty,
+        rated: game.rated === 'true'
+      };
+    });
+
+    return formattedResult;
+  } catch (error) {
+    console.error('Error fetching all games:', error);
+    return [];
+  }
 }
 // Authentication middleware
 function authenticateToken(req, res, next) {
   // Check token is present in cookie
   const token = req.cookies.token;
-
+  console.log(token)
   if (!token) {
     return res.status(401).send('Access denied. No token provided.');
   }
@@ -176,47 +176,34 @@ function authenticateToken(req, res, next) {
 
 // Routes
 
-// Home route
-app.get("/", (req, res) => {
-  const token = req.cookies.token;
-  if (token) {
-    return res.redirect('/home');
-  }
-  res.render("index");
-});
 
-// Login route
-app.get("/login", (req, res) => {
-  res.render("login");
-});
-
-// Signup route
-app.get("/signup", (req, res) => {
-  res.render("signup");
-});
-
-// Ranking table route
-app.get("/ranktable", (req, res) => {
-  res.render("ranktable");
+//who am i end point
+app.get('/whoami', authenticateToken, (req, res) => {
+  res.json({
+    user: req.user.userId
+  });
 });
 
 // Authentication route to create a new user (signup)
 app.post('/create', async (req, res) => {
-  const { name, userEmail, passward } = req.body;
+  const { userName, userEmail, passward } = req.body;
 
   try {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(passward, salt);
-    
-    const usersCollection = getCollection('users');
-    const existingUsers = await usersCollection.countDocuments();
+    const user = await usersCollection.findOne({ userEmail });
+    const usersCollection = await getCollection('users');
+    const existingUsers = usersCollection.countDocuments();
+    if (user) {
+      throw "This mail already esists";
+    }
 
     // Generate unique user ID
     const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     const newUser = {
       userId,
-      name,
+      name: userName,
       userEmail,
       password: hash,
       score: 0,
@@ -226,12 +213,15 @@ app.post('/create', async (req, res) => {
     await usersCollection.insertOne(newUser);
 
     // Store userId and username in JWT
-    const token = jwt.sign({ userId, username: name, userEmail }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId, username: userName, userEmail }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
-    res.redirect("/home");
+
+    res.json({
+      userId: user.userId
+    });
   } catch (error) {
     console.error('Error creating user:', error);
-    res.status(500).send('Error creating user');
+    res.status(500).send(`Error creating user+${error}`);
   }
 });
 
@@ -243,7 +233,7 @@ app.post('/login', async (req, res) => {
     const user = await usersCollection.findOne({ userEmail });
 
     if (!user) {
-      return res.status(400).send('User not found');
+      return res.status(410).send('User not found');
     }
 
     // Compare passwords
@@ -253,13 +243,15 @@ app.post('/login', async (req, res) => {
     }
 
     // If passwords match, sign JWT with userId and username
-    const token = jwt.sign({ 
-      userId: user.userId, 
-      username: user.name, 
-      userEmail: user.userEmail 
+    const token = jwt.sign({
+      userId: user.userId,
+      username: user.name,
+      userEmail: user.userEmail
     }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
-    res.redirect('/home');
+    res.json({
+      userId: user.userId
+    });
   } catch (error) {
     console.error('Error logging in:', error);
     res.status(500).send('Server error');
@@ -268,38 +260,32 @@ app.post('/login', async (req, res) => {
 
 // Logout route
 app.get('/logout', (req, res) => {
-  res.cookie("token", "", { expires: new Date(0) }); // Clear the token
-  res.redirect("/");
+  res.clearCookie("token", { httpOnly: true, path: '/' }); // Clear the token
+  res.status(200).send("user loggedout");
 });
-app.get('/profileboard',authenticateToken,(req,res)=>{
-  res.render('profile');
-})
+
 /* Protected routes (accessible only when logged in) 
   the basic user info can be retrived by req.requirement(userId, userName etc what ever is in the jwt)
 */
-// Home route
-app.get('/home', authenticateToken, (req, res) => {
-  res.render('mainindex');
-});
 
-// Dashboard route
-app.get('/dashboard', authenticateToken, (req, res) => {
-  res.render('dashboard');
-});
+
+
 
 // Profile route (fetching user data)
-app.get('/profile',authenticateToken, async (req, res) => {
+app.get('/profile', authenticateToken, async (req, res) => {
   try {
+    console.log("this is profile end point");
+    if (!req.query.userId) throw "Bad Request"
     const usersCollection = getCollection('users');
-    const user = await usersCollection.findOne({ userEmail: req.user.userEmail });
+    const user = await usersCollection.findOne({ userId: req.query.userId });
     if (!user) return res.status(404).send('User not found');
     res.send(user);
   } catch (error) {
-    res.status(500).send('Server error');
+    res.status(500).send(`Server error + ${error}`);
   }
 });
 // Update score route
-app.post('/updatescore', authenticateToken, async (req, res) => {
+app.post('/updateScore', authenticateToken, async (req, res) => {
   console.log('Reached /updatescore route');
   try {
     const { score } = req.body;
@@ -308,17 +294,17 @@ app.post('/updatescore', authenticateToken, async (req, res) => {
     console.log('User email:', userEmail);
 
     const usersCollection = getCollection('users');
-    
+
     // First, find the current user to get their existing score
     const currentUser = await usersCollection.findOne({ userEmail: userEmail });
-    
+
     if (!currentUser) {
       return res.status(404).send('User not found');
     }
-    
+
     // Calculate the new score as the maximum of the existing score and the new score
-    const newScore = Math.max(currentUser.score || 0, score);
-    
+    const newScore = Math.max(currentUser.score, score);
+
     // Update the user's score with the new maximum score
     const updatedUser = await usersCollection.findOneAndUpdate(
       { userEmail: userEmail },
@@ -336,7 +322,7 @@ app.post('/updatescore', authenticateToken, async (req, res) => {
   }
 });
 // Database status check route
-app.get('/database-status', async (req, res) => {
+app.get('/databaseStatus', async (req, res) => {
   try {
     const usersCollection = getCollection('users');
     // Perform a simple operation to check database connectivity
@@ -347,13 +333,14 @@ app.get('/database-status', async (req, res) => {
     res.status(500).json({ status: 'disconnected', error: error.message });
   }
 });
-app.get('/settings',authenticateToken,(req,res)=>{
+app.get('/settings', authenticateToken, (req, res) => {
   res.render('settings');
 })
 // Update password route
-app.post('/updatepassword', authenticateToken, async (req, res) => {
+app.post('/updatePassword', authenticateToken, async (req, res) => {
   try {
     const { newPassword } = req.body;
+    console.log(req.user);
     const userEmail = req.user.userEmail;
     console.log('Authenticated user email:', userEmail);
 
@@ -383,13 +370,10 @@ app.post('/updatepassword', authenticateToken, async (req, res) => {
   }
 });
 
-// Forget password route (renders reset password page)
-app.get('/resetpassword', (req, res) => {
-  res.render('resetpassword');   
-});
+
 
 // Forget password POST route
-app.post('/forgetpassword', async (req, res) => {
+app.post('/forgetPassword', async (req, res) => {
   try {
     const { userEmail, newPassword } = req.body;
     console.log('Received reset request for email:', userEmail);
@@ -428,8 +412,8 @@ app.post('/forgetpassword', async (req, res) => {
   }
 });
 
-// Check if user exists route
-app.post('/checkuser', async (req, res) => {
+// Check if user exists route --- unnecessery
+app.post('/checkUser', async (req, res) => {
   try {
     const { userEmail } = req.body;
 
@@ -451,8 +435,47 @@ app.post('/checkuser', async (req, res) => {
   }
 });
 
+//public profile view end point
+app.get('/publicprofile/:userEmail', async (req, res) => {
+  try {
+    const { userEmail } = req.params;
+    const usersCollection = getCollection('users');
+    const user = await usersCollection.findOne({ userEmail: userEmail });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error fetching public profile:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+// Update the user profile
+app.put('/updateprofile', authenticateToken, async (req, res) => {
+  try {
+    const { userImage, about, tags } = req.body;
+    const userEmail = req.user.userEmail;
+
+    const usersCollection = getCollection('users');
+    const updatedUser = await usersCollection.findOneAndUpdate(
+      { userEmail: userEmail },
+      { $set: { userImage: userImage, about: about, tags: tags } },
+      { returnDocument: 'after' }
+    );
+
+    if (!updatedUser.value) {
+      return res.status(404).send('User not found');
+    }
+
+    res.status(200).json({ message: 'Profile updated successfully', user: updatedUser.value });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+})
+
 // Update rank route
-app.post('/updaterank', authenticateToken, async (req, res) => {
+app.post('/updateRank', authenticateToken, async (req, res) => {
   try {
     const { rank } = req.body;
     const userEmail = req.user.userEmail;
@@ -486,36 +509,71 @@ app.get('/read', async (req, res) => {
   }
 });
 
-// send the user to loby
-app.get('/loby', authenticateToken, async(req,res)=>{
-  res.render('loby/index');
-})
-app.post('/loby',authenticateToken,async(req,res)=>{
-  try{
+// API route to get players with pagination for rank table
+app.get('/players', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 20; // 20 players per page
+    const skip = (page - 1) * limit;
+
+    const usersCollection = getCollection('users');
+
+    // Get total count for pagination
+    const totalPlayers = await usersCollection.countDocuments();
+
+    // Fetch players sorted by score (descending) with pagination
+    const players = await usersCollection
+      .find()
+      .sort({ score: -1 })
+      .skip(skip)
+      .limit(limit)
+      .toArray();
+
+    // Add rank to each player based on their position
+    const playersWithRank = players.map((player, index) => ({
+      ...player,
+      rank: skip + index + 1
+    }));
+
+    res.json({
+      players: playersWithRank,
+      currentPage: page,
+      totalPages: Math.ceil(totalPlayers / limit),
+      totalPlayers
+    });
+  } catch (error) {
+    console.error('Error fetching players:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+app.post('/loby', authenticateToken, async (req, res) => {
+  try {
     // Get userId from the decoded JWT token
     const userId = req.user.userId;
-    
+
     await makeRedisConnection();
 
     // Add the user id in redis queue
     await addUserToQueue(userId);
-    
+
     // Fetch the game_info objects present in redis as array
     const response = await getAllGames();
     res.status(200).json(response);
-  }catch(e){
+  } catch (e) {
     console.log("error is " + e);
     res.status(500).json({ error: "server error" });
   }
 })
 
 // Create game endpoint 
-app.post('/createGame', authenticateToken, async(req, res) => {
+app.post('/createGame', authenticateToken, async (req, res) => {
   try {
     const { questionAmount, difficulty, rated, maxCrowd, category } = req.body;
-    
+
     console.log('Creating game with params:', { questionAmount, difficulty, rated, maxCrowd, category });
-    
+
     // Validate input
     if (!questionAmount || !difficulty || rated === undefined) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -530,7 +588,7 @@ app.post('/createGame', authenticateToken, async(req, res) => {
     // Generate unique game ID
     const gameId = Date.now().toString();
     console.log('Generated game ID:', gameId);
-    
+
     // Fetch questions from OpenTDB API
     let triviaURL = `https://opentdb.com/api.php?amount=${questionAmount}&difficulty=${difficulty}`;
     if (category && category > 0) {
@@ -538,13 +596,13 @@ app.post('/createGame', authenticateToken, async(req, res) => {
     }
 
     console.log('Fetching questions from:', triviaURL);
-    
+
     const triviaResponse = await fetch(triviaURL);
     const triviaData = await triviaResponse.json();
-    
+
     console.log('Trivia API response code:', triviaData.response_code);
     console.log('Questions received:', triviaData.results ? triviaData.results.length : 0);
-    
+
     if (triviaData.response_code !== 0 || !triviaData.results) {
       console.error('Failed to fetch questions. Response:', triviaData);
       return res.status(500).json({ error: 'Failed to fetch questions from trivia API' });
@@ -553,9 +611,9 @@ app.post('/createGame', authenticateToken, async(req, res) => {
     // Store questions in Redis
     const client = await makeRedisConnection();
     const questionsKey = `game:${gameId}:questions`;
-    
+
     console.log('Storing questions in Redis with key:', questionsKey);
-    
+
     // Store each question as a hash
     for (let i = 0; i < triviaData.results.length; i++) {
       const question = triviaData.results[i];
@@ -569,11 +627,11 @@ app.post('/createGame', authenticateToken, async(req, res) => {
       });
       console.log(`Stored question ${i} in Redis`);
     }
-    
+
     // Store question count
     await client.set(`${questionsKey}:count`, triviaData.results.length.toString());
     console.log('Stored question count:', triviaData.results.length);
-    
+
     const gameData = {
       questionAmount: parseInt(questionAmount),
       locked: false, // Creator can manually lock the game
@@ -584,34 +642,31 @@ app.post('/createGame', authenticateToken, async(req, res) => {
 
     await createGame(gameId, gameData);
     console.log('Game created successfully:', gameId);
-    
-    res.status(201).json({ 
-      success: true, 
+
+    res.status(201).json({
+      success: true,
       message: 'Game created successfully',
       gameId: gameId,
       game: gameData
     });
-  } catch(e) {
+  } catch (e) {
     console.error("Error creating game:", e);
     res.status(500).json({ error: "Failed to create game: " + e.message });
   }
 })
-// fetch question from trivia
-app.post('/fetchQuestions',authenticateToken,(req,res)=>{
 
-})
 
-app.post('/joinGame', authenticateToken, async(req, res) => {
+app.post('/joinGame', authenticateToken, async (req, res) => {
   try {
     const { gameId } = req.body;
-    
+
     if (!gameId) {
       return res.status(400).json({ error: 'Game ID is required' });
     }
 
     const client = await makeRedisConnection();
     const gameKey = `game:${gameId}`;
-    
+
     // Check if game exists
     const gameExists = await client.exists(gameKey);
     if (!gameExists) {
@@ -620,7 +675,7 @@ app.post('/joinGame', authenticateToken, async(req, res) => {
 
     // Get game data
     const gameData = await client.hGetAll(gameKey);
-    
+
     // Check if game is manually locked by creator
     if (gameData.locked === 'true') {
       return res.status(403).json({ error: 'Game is locked by creator' });
@@ -629,7 +684,7 @@ app.post('/joinGame', authenticateToken, async(req, res) => {
     // Check crowd capacity
     const maxCrowd = parseInt(gameData.maxCrowd);
     const currentCrowd = parseInt(gameData.currentCrowd);
-    
+
     // If maxCrowd is not -1 (unlimited), check if game is full
     if (maxCrowd !== -1 && currentCrowd >= maxCrowd) {
       return res.status(403).json({ error: 'Game is full. Cannot accept more players.' });
@@ -652,13 +707,13 @@ app.post('/joinGame', authenticateToken, async(req, res) => {
       });
     }
 
-    res.status(200).json({ 
-      success: true, 
+    res.status(200).json({
+      success: true,
       message: 'Ready to join game',
       gameId,
       wsUrl: `/ws?gameId=${gameId}&token=${req.cookies.token}`
     });
-  } catch(e) {
+  } catch (e) {
     console.log("Error joining game: " + e);
     res.status(500).json({ error: "Failed to join game" });
   }
@@ -667,7 +722,7 @@ app.post('/joinGame', authenticateToken, async(req, res) => {
 // WebSocket connection handler
 wss.on('connection', async (ws, req) => {
   console.log('WebSocket connection attempt');
-  
+
   const params = new URLSearchParams(req.url.split('?')[1]);
   const gameId = params.get('gameId');
 
@@ -683,7 +738,7 @@ wss.on('connection', async (ws, req) => {
     // Extract token from cookie header
     const cookies = req.headers.cookie;
     console.log('Cookies received:', cookies);
-    
+
     if (!cookies) {
       console.log('No cookies found, closing connection');
       ws.close(1008, 'No authentication cookie');
@@ -712,7 +767,7 @@ wss.on('connection', async (ws, req) => {
     // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { userId, username } = decoded;
-    
+
     console.log('User authenticated:', userId, username);
 
     const room = gameRooms.get(gameId);
@@ -745,7 +800,7 @@ wss.on('connection', async (ws, req) => {
     // Add player to room
     room.players.set(userId, { ws, username, score: 0, answers: [] });
     console.log('Player added to room. Total players:', room.players.size);
-    
+
     // Update current crowd count in Redis
     await client.hSet(`game:${gameId}`, 'currentCrowd', room.players.size.toString());
 
@@ -790,7 +845,7 @@ wss.on('connection', async (ws, req) => {
       const room = gameRooms.get(gameId);
       if (room) {
         room.players.delete(userId);
-        
+
         // Update current crowd count
         const client = await makeRedisConnection();
         await client.hSet(`game:${gameId}`, 'currentCrowd', room.players.size.toString());
@@ -806,7 +861,7 @@ wss.on('connection', async (ws, req) => {
         if (room.players.size === 0) {
           if (room.timer) clearTimeout(room.timer);
           gameRooms.delete(gameId);
-          
+
           // Remove game from Redis
           await client.sRem('active_games', `game:${gameId}`);
           await client.del(`game:${gameId}`);
@@ -824,9 +879,9 @@ wss.on('connection', async (ws, req) => {
 // Handle WebSocket upgrade
 server.on('upgrade', (request, socket, head) => {
   const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
-  
+
   console.log('Upgrade request for path:', pathname);
-  
+
   if (pathname === '/ws') {
     wss.handleUpgrade(request, socket, head, (ws) => {
       wss.emit('connection', ws, request);
@@ -859,10 +914,10 @@ async function handlePlayerMessage(gameId, userId, data) {
       if (!room.started && room.players.size > 0) {
         room.started = true;
         console.log('Game started by user:', userId);
-        
+
         // Note: Game is NOT locked when started, just no new players can join
         // The lock is only for manual locking by creator
-        
+
         // Start sending questions
         await sendNextQuestion(gameId);
       }
@@ -874,17 +929,17 @@ async function handlePlayerMessage(gameId, userId, data) {
         // Validate answer server-side
         console.log(`Answer validation - Player answer: "${data.answer}", Correct answer: "${room.currentCorrectAnswer}"`);
         console.log(`Answer types - Player: ${typeof data.answer}, Correct: ${typeof room.currentCorrectAnswer}`);
-        
+
         const correct = data.answer === room.currentCorrectAnswer;
-        
+
         console.log(`Player ${userId} answered question ${data.questionIndex}: ${correct ? 'CORRECT' : 'WRONG'}`);
-        
+
         player.answers[data.questionIndex] = {
           answer: data.answer,
           timeSpent: data.timeSpent,
           correct: correct
         };
-        
+
         // Update score: +5 for correct, -1 for wrong
         const oldScore = player.score;
         if (correct) {
@@ -894,7 +949,7 @@ async function handlePlayerMessage(gameId, userId, data) {
           player.score -= 1;
           console.log(`Player ${userId} score: ${oldScore} - 1 = ${player.score}`);
         }
-        
+
         // Cache score in Redis (don't update DB yet)
         const client = await makeRedisConnection();
         await client.hSet(`game:${gameId}:scores`, userId, player.score.toString());
@@ -942,30 +997,30 @@ async function sendNextQuestion(gameId) {
     // Fetch question from Redis
     const client = await makeRedisConnection();
     const questionKey = `game:${gameId}:questions:${room.questionIndex}`;
-    
+
     console.log('sendNextQuestion: Fetching question from Redis key:', questionKey);
-    
+
     const questionData = await client.hGetAll(questionKey);
-    
+
     console.log('sendNextQuestion: Question data retrieved:', questionData);
-    
+
     if (!questionData || !questionData.question) {
       console.error('sendNextQuestion: Question not found in Redis for key:', questionKey);
-      
+
       // Check if questions exist at all
       const questionCount = await client.get(`game:${gameId}:questions:count`);
       console.error('sendNextQuestion: Question count in Redis:', questionCount);
-      
+
       // List all keys for this game
       const allKeys = await client.keys(`game:${gameId}:*`);
       console.error('sendNextQuestion: All keys for this game:', allKeys);
-      
+
       return;
     }
 
     // Parse incorrect answers
     const incorrectAnswers = JSON.parse(questionData.incorrect_answers);
-    
+
     // Shuffle options (correct + incorrect)
     const allOptions = [questionData.correct_answer, ...incorrectAnswers];
     const shuffledOptions = allOptions.sort(() => Math.random() - 0.5);
@@ -993,7 +1048,7 @@ async function sendNextQuestion(gameId) {
     // Set timer for 20 seconds
     room.timer = setTimeout(async () => {
       console.log('sendNextQuestion: Timer expired for question', room.questionIndex);
-      
+
       // Show leaderboard
       const leaderboard = Array.from(room.players.entries())
         .map(([id, p]) => ({
@@ -1047,29 +1102,29 @@ async function endGame(gameId) {
   if (room.gameData.rated) {
     console.log('Updating scores for rated game');
     const usersCollection = getCollection('users');
-    
+
     for (const [userId, player] of room.players.entries()) {
       try {
         // Fetch cached score from Redis
         const client = await makeRedisConnection();
         const cachedScore = await client.hGet(`game:${gameId}:scores`, userId);
         const scoreToAdd = cachedScore ? parseInt(cachedScore) : player.score;
-        
+
         console.log(`Updating score for user ${userId}: adding ${scoreToAdd} points`);
-        
+
         // Get current user score
         const user = await usersCollection.findOne({ userId });
         const currentScore = user ? user.score : 0;
         const newTotalScore = currentScore + scoreToAdd;
-        
+
         console.log(`User ${userId}: ${currentScore} + ${scoreToAdd} = ${newTotalScore}`);
-        
+
         // Update user's total score in MongoDB (accumulated)
         await usersCollection.findOneAndUpdate(
           { userId },
           { $set: { score: newTotalScore } }
         );
-        
+
         console.log(`Successfully updated score for user ${userId}`);
       } catch (error) {
         console.error(`Error updating score for user ${userId}:`, error);
@@ -1081,7 +1136,7 @@ async function endGame(gameId) {
 
   // Clean up Redis data
   const client = await makeRedisConnection();
-  
+
   // Delete questions
   const questionCount = await client.get(`game:${gameId}:questions:count`);
   if (questionCount) {
@@ -1090,19 +1145,19 @@ async function endGame(gameId) {
     }
     await client.del(`game:${gameId}:questions:count`);
   }
-  
+
   // Delete cached scores
   await client.del(`game:${gameId}:scores`);
-  
+
   // Delete game data
   await client.sRem('active_games', `game:${gameId}`);
   await client.del(`game:${gameId}`);
-  
+
   console.log('Redis cleanup completed for game:', gameId);
-  
+
   // Clean up room timer
   if (room.timer) clearTimeout(room.timer);
-  
+
   // Close all connections after 10 seconds
   setTimeout(() => {
     console.log('Closing all connections for game:', gameId);
