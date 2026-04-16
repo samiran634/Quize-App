@@ -1,23 +1,34 @@
 {
-  "name": "quize-app",
-  "version": "1.0.0",
-  "description": "A beautiful place to cheak your knowledge",
-  "main": "main.js",
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
-  "author": "sam",
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/samiran634/Quize-App.git"
+  "dependencies": {
+    "@lottiefiles/dotlottie-react": "^0.18.9",
+    "animejs": "^4.3.6",
+    "lucide-react": "^1.7.0",
+    "react": "^19.2.4",
+    "react-cookie": "^8.0.1",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.2"
   },
-  "keywords": [
-    "gt"
-  ],
-  "bugs": {
-    "url": "https://github.com/samiran634/Quize-App/issues"
-  },
-  "homepage": "https://github.com/samiran634/Quize-App#readme"
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "tailwindcss": "^4.2.2",
+    "vite": "^8.0.1"
+  }
 }
