@@ -33,7 +33,7 @@ const Home = () => {
             name: "Logout", onClick: async () => {
                 setIsLoggingOut(true);
                 try {
-                    await fetch(`${import.meta.env.VITE_BACKEND_URL}/logout`, { credentials: 'include' });
+                    await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/logout`, { credentials: 'include' });
                     logout();
                     navigate('/');
                 } catch (e) {
@@ -75,7 +75,7 @@ const Home = () => {
     };
 
     const handleUpdatedScore = async () => {
-        const URl = `${import.meta.env.VITE_BACKEND_URL}/updateScale`; // Assuming this was intended
+        const URl = `${import.meta.env.VITE_BACKEND_URL}/api/updateScale`; // Assuming this was intended
         // Logic omitted as in original
     };
 

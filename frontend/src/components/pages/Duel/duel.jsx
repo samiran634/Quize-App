@@ -4,8 +4,8 @@ import { renderLobby } from './lobby';
 import { renderCreateGame } from './game';
 import { renderGameRoom } from './gameRoom';
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
-const wsBaseUrl = backendUrl.replace(/^http/, 'ws');
+const backendUrl = import.meta.env.VITE_BACKEND_URL + '/api';
+const wsBaseUrl = import.meta.env.VITE_BACKEND_URL.replace(/^http/, 'ws');
 
 export default function Duel() {
   const navigate = useNavigate();

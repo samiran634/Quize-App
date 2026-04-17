@@ -16,7 +16,7 @@ const PublicProfilePage = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/publicprofile/${encodeURIComponent(userEmail)}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/publicprofile/${encodeURIComponent(userEmail)}`
       );
 
       if (!response.ok) {
