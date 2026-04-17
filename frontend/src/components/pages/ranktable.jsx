@@ -24,7 +24,7 @@ const RankTable = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players?page=${page}`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/players?page=${page}`, {
         credentials: 'include'
       });
 

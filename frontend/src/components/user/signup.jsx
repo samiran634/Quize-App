@@ -16,7 +16,7 @@ const SignUp = () => {
     setIsDisabled(true);
     try {
       const name = firstName + (lastName ? ' ' + lastName : '');
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/create`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -175,25 +175,26 @@ function authenticateToken(req, res, next) {
 
 
 // Routes
+const apiRouter = express.Router();
 
 
 //who am i end point
-app.get('/whoami', authenticateToken, (req, res) => {
+apiRouter.get('/whoami', authenticateToken, (req, res) => {
   res.json({
     user: req.user.userId
   });
 });
 
 // Authentication route to create a new user (signup)
-app.post('/create', async (req, res) => {
+apiRouter.post('/create', async (req, res) => {
   const { userName, userEmail, passward } = req.body;
 
   try {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(passward, salt);
-    const user = await usersCollection.findOne({ userEmail });
     const usersCollection = await getCollection('users');
-    const existingUsers = usersCollection.countDocuments();
+    const user = await usersCollection.findOne({ userEmail });
+    const existingUsers = await usersCollection.countDocuments();
     if (user) {
       throw "This mail already esists";
     }
@@ -217,7 +218,7 @@ app.post('/create', async (req, res) => {
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
 
     res.json({
-      userId: user.userId
+      userId: userId
     });
   } catch (error) {
     console.error('Error creating user:', error);
@@ -226,7 +227,7 @@ app.post('/create', async (req, res) => {
 });
 
 // Authentication route for login
-app.post('/login', async (req, res) => {
+apiRouter.post('/login', async (req, res) => {
   try {
     const { userEmail, passward } = req.body;
     const usersCollection = getCollection('users');
@@ -259,7 +260,7 @@ app.post('/login', async (req, res) => {
 });
 
 // Logout route
-app.get('/logout', (req, res) => {
+apiRouter.get('/logout', (req, res) => {
   res.clearCookie("token", { httpOnly: true, path: '/' }); // Clear the token
   res.status(200).send("user loggedout");
 });
@@ -272,7 +273,7 @@ app.get('/logout', (req, res) => {
 
 
 // Profile route (fetching user data)
-app.get('/profile', authenticateToken, async (req, res) => {
+apiRouter.get('/profile', authenticateToken, async (req, res) => {
   try {
     console.log("this is profile end point");
     if (!req.query.userId) throw "Bad Request"
@@ -285,7 +286,7 @@ app.get('/profile', authenticateToken, async (req, res) => {
   }
 });
 // Update score route
-app.post('/updateScore', authenticateToken, async (req, res) => {
+apiRouter.post('/updateScore', authenticateToken, async (req, res) => {
   console.log('Reached /updatescore route');
   try {
     const { score } = req.body;
@@ -322,7 +323,7 @@ app.post('/updateScore', authenticateToken, async (req, res) => {
   }
 });
 // Database status check route
-app.get('/databaseStatus', async (req, res) => {
+apiRouter.get('/databaseStatus', async (req, res) => {
   try {
     const usersCollection = getCollection('users');
     // Perform a simple operation to check database connectivity
@@ -333,11 +334,11 @@ app.get('/databaseStatus', async (req, res) => {
     res.status(500).json({ status: 'disconnected', error: error.message });
   }
 });
-app.get('/settings', authenticateToken, (req, res) => {
+apiRouter.get('/settings', authenticateToken, (req, res) => {
   res.render('settings');
 })
 // Update password route
-app.post('/updatePassword', authenticateToken, async (req, res) => {
+apiRouter.post('/updatePassword', authenticateToken, async (req, res) => {
   try {
     const { newPassword } = req.body;
     console.log(req.user);
@@ -373,7 +374,7 @@ app.post('/updatePassword', authenticateToken, async (req, res) => {
 
 
 // Forget password POST route
-app.post('/forgetPassword', async (req, res) => {
+apiRouter.post('/forgetPassword', async (req, res) => {
   try {
     const { userEmail, newPassword } = req.body;
     console.log('Received reset request for email:', userEmail);
@@ -413,7 +414,7 @@ app.post('/forgetPassword', async (req, res) => {
 });
 
 // Check if user exists route --- unnecessery
-app.post('/checkUser', async (req, res) => {
+apiRouter.post('/checkUser', async (req, res) => {
   try {
     const { userEmail } = req.body;
 
@@ -436,7 +437,7 @@ app.post('/checkUser', async (req, res) => {
 });
 
 //public profile view end point
-app.get('/publicprofile/:userEmail', async (req, res) => {
+apiRouter.get('/publicprofile/:userEmail', async (req, res) => {
   try {
     const { userEmail } = req.params;
     const usersCollection = getCollection('users');
@@ -451,7 +452,7 @@ app.get('/publicprofile/:userEmail', async (req, res) => {
   }
 });
 // Update the user profile
-app.put('/updateprofile', authenticateToken, async (req, res) => {
+apiRouter.put('/updateprofile', authenticateToken, async (req, res) => {
   try {
     const { userImage, about, tags } = req.body;
     const userEmail = req.user.userEmail;
@@ -475,7 +476,7 @@ app.put('/updateprofile', authenticateToken, async (req, res) => {
 })
 
 // Update rank route
-app.post('/updateRank', authenticateToken, async (req, res) => {
+apiRouter.post('/updateRank', authenticateToken, async (req, res) => {
   try {
     const { rank } = req.body;
     const userEmail = req.user.userEmail;
@@ -499,7 +500,7 @@ app.post('/updateRank', authenticateToken, async (req, res) => {
 });
 
 // API route to read user data
-app.get('/read', async (req, res) => {
+apiRouter.get('/read', async (req, res) => {
   try {
     const usersCollection = getCollection('users');
     const users = await usersCollection.find().toArray();
@@ -510,7 +511,7 @@ app.get('/read', async (req, res) => {
 });
 
 // API route to get players with pagination for rank table
-app.get('/players', async (req, res) => {
+apiRouter.get('/players', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 20; // 20 players per page
@@ -548,7 +549,7 @@ app.get('/players', async (req, res) => {
 });
 
 
-app.post('/loby', authenticateToken, async (req, res) => {
+apiRouter.post('/loby', authenticateToken, async (req, res) => {
   try {
     // Get userId from the decoded JWT token
     const userId = req.user.userId;
@@ -568,7 +569,7 @@ app.post('/loby', authenticateToken, async (req, res) => {
 })
 
 // Create game endpoint 
-app.post('/createGame', authenticateToken, async (req, res) => {
+apiRouter.post('/createGame', authenticateToken, async (req, res) => {
   try {
     const { questionAmount, difficulty, rated, maxCrowd, category } = req.body;
 
@@ -656,7 +657,7 @@ app.post('/createGame', authenticateToken, async (req, res) => {
 })
 
 
-app.post('/joinGame', authenticateToken, async (req, res) => {
+apiRouter.post('/joinGame', authenticateToken, async (req, res) => {
   try {
     const { gameId } = req.body;
 
@@ -1167,6 +1168,9 @@ async function endGame(gameId) {
 }
 
 // Add this at the end of your route definitions
+// Mount all API routes under /api
+app.use('/api', apiRouter);
+
 app.use((req, res, next) => {
   console.log(`Unmatched route: ${req.method} ${req.path}`);
   res.status(404).send('Route not found');

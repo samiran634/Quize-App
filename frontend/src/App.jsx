@@ -15,7 +15,7 @@ import PublicProfilePage from './components/pages/publicProfilePage'
 // Example 1: Fetch trivia categories for rank table
 const rankTableLoader = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/players?page=1`);
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/players?page=1`);
     const data = await response.json();
     return { categories: data.trivia_categories };
   } catch (error) {
@@ -29,7 +29,7 @@ const fetchUserDataLoader = async ({ params }) => { // 1. Destructure params fro
     const userId = params.userId; // 2. Extract userId from params
     if (!userId) throw "User ID is missing";
 
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile?userId=${userId}`, {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/profile?userId=${userId}`, {
       credentials: "include"
     });
 
@@ -50,7 +50,7 @@ const fetchUserDataLoader = async ({ params }) => { // 1. Destructure params fro
 // Called on /login and /signup: checks if user already has a valid cookie session
 const whoAmILoader = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/whoami`, {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/whoami`, {
       credentials: 'include'
     });
     if (response.ok) {
